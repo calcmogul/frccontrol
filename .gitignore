@@ -1,0 +1,7 @@
+.eggs/
+.pytest_cache/
+build/
+dist/
+__pycache__
+*.egg-info/
+version.py
