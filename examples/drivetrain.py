@@ -60,7 +60,6 @@ class Drivetrain(frccnt.System):
         q = [q_pos, q_vel, q_pos, q_vel]
         r = [12.0, 12.0]
         self.design_dlqr_controller(q, r)
-        self.design_two_state_feedforward(q, r)
 
         qff_pos = 0.005
         qff_vel = 1.0
@@ -79,10 +78,13 @@ class Drivetrain(frccnt.System):
 def main():
     dt = 0.00505
     drivetrain = Drivetrain(dt)
-    drivetrain.export_cpp_coeffs("Drivetrain")
+    drivetrain.export_cpp_coeffs("Drivetrain", "Subsystems/")
 
-    # drivetrain.plot_pzmaps(1)
-    plt.savefig("drivetrain_pzmaps.svg")
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        # drivetrain.plot_pzmaps(1)
+        pass
+    if "--save-plots" in sys.argv:
+        plt.savefig("drivetrain_pzmaps.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -102,9 +104,10 @@ def main():
             r = np.matrix([[0.0], [0.0], [0.0], [0.0]])
         refs.append(r)
 
-    drivetrain.plot_time_responses(2, t, refs)
-    plt.savefig("drivetrain_response.svg")
-
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        drivetrain.plot_time_responses(2, t, refs)
+    if "--save-plots" in sys.argv:
+        plt.savefig("drivetrain_response.svg")
     if "--noninteractive" not in sys.argv:
         plt.show()
 

@@ -60,11 +60,14 @@ class SystemWriter:
         """Writes C++ source file.
 
         Keyword arguments:
-        header_prefix -- path prefix in which header exists
+        header_path_prefix -- path prefix in which header exists
         """
         plant_coeffs_type = "frc::" + self.plant_coeffs
         controller_coeffs_type = "frc::" + self.controller_coeffs
         observer_coeffs_type = "frc::" + self.observer_coeffs
+
+        if len(header_path_prefix) > 0 and header_path_prefix[-1] != os.sep:
+            header_path_prefix += os.sep
 
         with open(self.system_name + "Coeffs.cpp", "w") as source_file:
             source_file.write("#include \"" + header_path_prefix +
@@ -110,7 +113,7 @@ class SystemWriter:
                               os.linesep)
             source_file.write("}" + os.linesep + os.linesep)
 
-            source_file.write(plant_coeffs_type + self.template + " Make" +
+            source_file.write(observer_coeffs_type + self.template + " Make" +
                               self.system_name + "ObserverCoeffs() {" +
                               os.linesep)
             if self.period_variant:

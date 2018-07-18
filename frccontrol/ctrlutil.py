@@ -38,20 +38,6 @@ def dpzmap(sys, title):
 
 
 def closed_loop_ctrl(system):
-    """Constructs the closed-loop system for a continuous controller.
-
-    Keyword arguments:
-    system -- a System instance
-
-    Returns:
-    StateSpace instance representing closed-loop controller.
-    """
-    return cnt.StateSpace(
-        system.sysc.A - system.sysc.B * system.K, system.sysc.B * system.K,
-        system.sysc.C - system.sysc.D * system.K, system.sysc.D * system.K)
-
-
-def closed_loop_dctrl(system):
     """Constructs the closed-loop system for a discrete controller.
 
     Keyword arguments:
@@ -65,27 +51,12 @@ def closed_loop_dctrl(system):
         system.sysd.C - system.sysd.D * system.K, system.sysd.D * system.K)
 
 
-def closed_loop_obsv(system):
-    """Constructs the closed-loop system for a continuous observer.
+def plot_observer_poles(system):
+    """Plot discrete observer poles.
 
     Keyword arguments:
     system -- a System instance
-
-    Returns:
-    StateSpace instance representing closed-loop observer.
     """
-    return cnt.StateSpace(system.sysc.A - system.L * system.sysc.C,
-                          system.sysc.B, system.sysc.C, system.sysc.D)
-
-
-def closed_loop_dobsv(system):
-    """Constructs the closed-loop system for a discrete observer.
-
-    Keyword arguments:
-    system -- a System instance
-
-    Returns:
-    StateSpace instance representing closed-loop observer.
-    """
-    return cnt.StateSpace(system.sysd.A - system.L * system.sysd.C,
-                          system.sysd.B, system.sysd.C, system.sysd.D)
+    sys_cl = cnt.StateSpace(system.sysd.A - system.L * system.sysd.C,
+                            system.sysd.B, system.sysd.C, system.sysd.D)
+    dpzmap(sys_cl, title="Observer poles")

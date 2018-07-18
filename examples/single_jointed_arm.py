@@ -49,10 +49,13 @@ class SingleJointedArm(frccnt.System):
 def main():
     dt = 0.00505
     single_jointed_arm = SingleJointedArm(dt)
-    single_jointed_arm.export_cpp_coeffs("SingleJointedArm")
+    single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "Subsystems/")
 
-    # single_jointed_arm.plot_pzmaps(1)
-    plt.savefig("single_jointed_arm_pzmaps.svg")
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        # single_jointed_arm.plot_pzmaps(1)
+        pass
+    if "--save-plots" in sys.argv:
+        plt.savefig("single_jointed_arm_pzmaps.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -74,9 +77,10 @@ def main():
             r = np.matrix([[0.0], [0.0]])
         refs.append(r)
 
-    single_jointed_arm.plot_time_responses(2, t, refs)
-    plt.savefig("single_jointed_arm_response.svg")
-
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        single_jointed_arm.plot_time_responses(2, t, refs)
+    if "--save-plots" in sys.argv:
+        plt.savefig("single_jointed_arm_response.svg")
     if "--noninteractive" not in sys.argv:
         plt.show()
 

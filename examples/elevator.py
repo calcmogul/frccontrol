@@ -45,10 +45,13 @@ class Elevator(frccnt.System):
 def main():
     dt = 0.00505
     elevator = Elevator(dt)
-    elevator.export_cpp_coeffs("Elevator")
+    elevator.export_cpp_coeffs("Elevator", "Subsystems/")
 
-    # elevator.plot_pzmaps(1)
-    plt.savefig("elevator_pzmaps.svg")
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        # elevator.plot_pzmaps(1)
+        pass
+    if "--save-plots" in sys.argv:
+        plt.savefig("elevator_pzmaps.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -68,9 +71,10 @@ def main():
             r = np.matrix([[0.0], [0.0]])
         refs.append(r)
 
-    elevator.plot_time_responses(2, t, refs)
-    plt.savefig("elevator_response.svg")
-
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        elevator.plot_time_responses(2, t, refs)
+    if "--save-plots" in sys.argv:
+        plt.savefig("elevator_response.svg")
     if "--noninteractive" not in sys.argv:
         plt.show()
 

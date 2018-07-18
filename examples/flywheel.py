@@ -45,10 +45,12 @@ class Flywheel(frccnt.System):
 def main():
     dt = 0.00505
     flywheel = Flywheel(dt)
-    flywheel.export_cpp_coeffs("Flywheel")
+    flywheel.export_cpp_coeffs("Flywheel", "Subsystems/")
 
-    flywheel.plot_pzmaps(1)
-    plt.savefig("flywheel_pzmaps.svg")
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        flywheel.plot_pzmaps(1)
+    if "--save-plots" in sys.argv:
+        plt.savefig("flywheel_pzmaps.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -68,9 +70,10 @@ def main():
             r = np.matrix([[0]])
         refs.append(r)
 
-    flywheel.plot_time_responses(2, t, refs)
-    plt.savefig("flywheel_response.svg")
-
+    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
+        flywheel.plot_time_responses(2, t, refs)
+    if "--save-plots" in sys.argv:
+        plt.savefig("flywheel_response.svg")
     if "--noninteractive" not in sys.argv:
         plt.show()
 

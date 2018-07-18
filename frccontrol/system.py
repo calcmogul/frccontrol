@@ -147,11 +147,11 @@ class System:
         # Plot pole-zero map of closed-loop system
         plt.subplot(2, 2, 2)
         frccnt.dpzmap(
-            frccnt.closed_loop_dctrl(self), title="Closed-loop system")
+            frccnt.closed_loop_ctrl(self), title="Closed-loop system")
 
         # Plot observer poles
         plt.subplot(2, 2, 3)
-        frccnt.dpzmap(frccnt.closed_loop_dobsv(self), title="Observer poles")
+        frccnt.plot_observer_poles(self)
 
     def extract_row(self, buf, idx):
         """Extract row from 2D array.
@@ -266,15 +266,19 @@ class System:
         """
         return np.diag(np.square(elems))
 
-    def export_cpp_coeffs(self, name, period_variant=False):
+    def export_cpp_coeffs(self,
+                          name,
+                          header_path_prefix="",
+                          period_variant=False):
         """Exports matrices to pair of C++ source files.
 
         Keyword arguments:
         name -- subsystem class name in camel case
+        header_path_prefix -- path prefix in which header exists
         period_variant -- True to use PeriodVariantLoop, False to use
                           StateSpaceLoop
         """
         system_writer = frccnt.system_writer.SystemWriter(
             self, name, period_variant)
         system_writer.write_cpp_header()
-        system_writer.write_cpp_source("")
+        system_writer.write_cpp_source(header_path_prefix)
