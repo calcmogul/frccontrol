@@ -48,7 +48,9 @@ class Drivetrain(frccnt.System):
         self.model = frccnt.models.drivetrain(frccnt.models.MOTOR_CIM,
                                               self.num_motors, self.m, self.r,
                                               self.rb, self.J, self.Gl, self.Gr)
-        frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
+        u_min = np.matrix([[-12.0], [-12.0]])
+        u_max = np.matrix([[12.0], [12.0]])
+        frccnt.System.__init__(self, self.model, u_min, u_max, dt)
 
         if self.in_low_gear:
             q_pos = 0.12
