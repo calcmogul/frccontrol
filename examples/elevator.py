@@ -48,7 +48,8 @@ def main():
     elevator.export_cpp_coeffs("Elevator", "Subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        # elevator.plot_pzmaps(1)
+        # plt.figure(1)
+        # elevator.plot_pzmaps()
         pass
     if "--save-plots" in sys.argv:
         plt.savefig("elevator_pzmaps.svg")
@@ -72,7 +73,8 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        elevator.plot_time_responses(2, t, refs)
+        plt.figure(2)
+        elevator.plot_time_responses(t, refs)
     if "--save-plots" in sys.argv:
         plt.savefig("elevator_response.svg")
     if "--noninteractive" not in sys.argv:

@@ -131,15 +131,10 @@ class System:
         self.Kff = np.linalg.inv(self.sysd.B.T * Q * self.sysd.B +
                                  R.T) * self.sysd.B.T * Q
 
-    def plot_pzmaps(self, figure_num):
+    def plot_pzmaps(self):
         """Plots pole-zero maps of open-loop system, closed-loop system, and
         observer poles.
-
-        Keyword arguments:
-        figure_num -- number of figure on which to draw pole-zero maps.
         """
-        plt.figure(figure_num)
-
         # Plot pole-zero map of open-loop system
         plt.subplot(2, 2, 1)
         frccnt.dpzmap(self.sysd, title="Open-loop system")
@@ -187,17 +182,15 @@ class System:
 
         return state_rec, ref_rec, u_rec
 
-    def plot_time_responses(self, figure_num, t, refs):
+    def plot_time_responses(self, t, refs):
         """Plots time-domain responses of the system and the control inputs.
 
         Keyword arguments:
-        figure_num -- number of figure on which to draw pole-zero maps.
         time -- list of timesteps corresponding to references.
         refs -- list of tuples of time-reference pairs.
         """
         state_rec, ref_rec, u_rec = self.generate_time_responses(t, refs)
 
-        plt.figure(figure_num)
         subplot_max = self.sysd.states + self.sysd.inputs
         for i in range(self.sysd.states):
             plt.subplot(subplot_max, 1, i + 1)

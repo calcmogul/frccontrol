@@ -52,7 +52,8 @@ def main():
     single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "Subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        # single_jointed_arm.plot_pzmaps(1)
+        # plt.figure(1)
+        # single_jointed_arm.plot_pzmaps()
         pass
     if "--save-plots" in sys.argv:
         plt.savefig("single_jointed_arm_pzmaps.svg")
@@ -78,7 +79,8 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        single_jointed_arm.plot_time_responses(2, t, refs)
+        plt.figure(2)
+        single_jointed_arm.plot_time_responses(t, refs)
     if "--save-plots" in sys.argv:
         plt.savefig("single_jointed_arm_response.svg")
     if "--noninteractive" not in sys.argv:

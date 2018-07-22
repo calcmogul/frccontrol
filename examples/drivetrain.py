@@ -83,7 +83,8 @@ def main():
     drivetrain.export_cpp_coeffs("Drivetrain", "Subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        # drivetrain.plot_pzmaps(1)
+        # plt.figure(1)
+        # drivetrain.plot_pzmaps()
         pass
     if "--save-plots" in sys.argv:
         plt.savefig("drivetrain_pzmaps.svg")
@@ -107,7 +108,8 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        drivetrain.plot_time_responses(2, t, refs)
+        plt.figure(2)
+        drivetrain.plot_time_responses(t, refs)
     if "--save-plots" in sys.argv:
         plt.savefig("drivetrain_response.svg")
     if "--noninteractive" not in sys.argv:
