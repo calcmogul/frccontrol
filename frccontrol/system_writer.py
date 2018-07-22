@@ -18,43 +18,58 @@ class SystemWriter:
         """
         self.system = system
         self.system_name = system_name
-        self.template = "<" + str(system.sysd.A.shape[0]) + ", " + str(
+        template = "<" + str(system.sysd.A.shape[0]) + ", " + str(
             system.sysd.B.shape[1]) + ", " + str(system.sysd.C.shape[0]) + ">"
 
         self.period_variant = period_variant
         if period_variant:
-            self.plant_coeffs = "PeriodVariantPlantCoeffs"
-            self.observer_coeffs = "PeriodVariantKalmanFilterCoeffs"
+            self.class_type = "PeriodVariant"
+            self.plant_coeffs_header = "PeriodVariantPlantCoeffs"
+            self.obsv_coeffs_header = "PeriodVariantKalmanFilterCoeffs"
+            self.loop_header = "PeriodVariantLoop"
         else:
-            self.plant_coeffs = "StateSpacePlantCoeffs"
-            self.observer_coeffs = "StateSpaceObserverCoeffs"
-        self.controller_coeffs = "StateSpaceControllerCoeffs"
+            self.class_type = "StateSpace"
+            self.plant_coeffs_header = "StateSpacePlantCoeffs"
+            self.obsv_coeffs_header = "StateSpaceObserverCoeffs"
+            self.loop_header = "StateSpaceLoop"
+
+        self.ctrl_coeffs_header = "StateSpaceControllerCoeffs"
+        self.ctrl_coeffs_type = "frc::" + self.ctrl_coeffs_header + template
+        self.plant_coeffs_type = "frc::" + self.plant_coeffs_header + template
+        self.obsv_coeffs_type = "frc::" + self.obsv_coeffs_header + template
+        self.loop_type = "frc::" + self.loop_header + template
 
     def write_cpp_header(self):
         """Writes C++ header file."""
-        prefix = "#include \"Controllers/"
+        prefix = "#include <Controllers/"
         headers = []
-        headers.append(prefix + self.plant_coeffs + ".h\"")
-        headers.append(prefix + self.controller_coeffs + ".h\"")
-        headers.append(prefix + self.observer_coeffs + ".h\"")
-
-        plant_coeffs_type = "frc::" + self.plant_coeffs
-        controller_coeffs_type = "frc::" + self.controller_coeffs
-        observer_coeffs_type = "frc::" + self.observer_coeffs
+        headers.append(prefix + self.plant_coeffs_header + ".h>")
+        headers.append(prefix + self.ctrl_coeffs_header + ".h>")
+        headers.append(prefix + self.obsv_coeffs_header + ".h>")
+        headers.append(prefix + self.loop_header + ".h>")
 
         with open(self.system_name + "Coeffs.h", "w") as header_file:
-            header_file.write("#pragma once" + os.linesep + os.linesep)
+            print("#pragma once" + os.linesep, file=header_file)
             for header in sorted(headers):
-                header_file.write(header + os.linesep)
+                print(header, file=header_file)
             header_file.write(os.linesep)
-            header_file.write(plant_coeffs_type + self.template + " Make" +
-                              self.system_name + "PlantCoeffs();" + os.linesep)
-            header_file.write(controller_coeffs_type + self.template + " Make" +
-                              self.system_name + "ControllerCoeffs();" +
-                              os.linesep)
-            header_file.write(observer_coeffs_type + self.template + " Make" +
-                              self.system_name + "ObserverCoeffs();" +
-                              os.linesep)
+            self.__write_cpp_func_name(
+                header_file,
+                self.plant_coeffs_type,
+                "PlantCoeffs",
+                in_header=True)
+            self.__write_cpp_func_name(
+                header_file,
+                self.ctrl_coeffs_type,
+                "ControllerCoeffs",
+                in_header=True)
+            self.__write_cpp_func_name(
+                header_file,
+                self.obsv_coeffs_type,
+                "ObserverCoeffs",
+                in_header=True)
+            self.__write_cpp_func_name(
+                header_file, self.loop_type, "Loop", in_header=True)
 
     def write_cpp_source(self, header_path_prefix):
         """Writes C++ source file.
@@ -62,21 +77,22 @@ class SystemWriter:
         Keyword arguments:
         header_path_prefix -- path prefix in which header exists
         """
-        plant_coeffs_type = "frc::" + self.plant_coeffs
-        controller_coeffs_type = "frc::" + self.controller_coeffs
-        observer_coeffs_type = "frc::" + self.observer_coeffs
-
         if len(header_path_prefix) > 0 and header_path_prefix[-1] != os.sep:
             header_path_prefix += os.sep
 
         with open(self.system_name + "Coeffs.cpp", "w") as source_file:
-            source_file.write("#include \"" + header_path_prefix +
-                              self.system_name + "Coeffs.h\"" + os.linesep +
-                              os.linesep)
-            source_file.write("#include <Eigen/Core>" + os.linesep + os.linesep)
+            print(
+                "#include \"" + header_path_prefix + self.system_name +
+                "Coeffs.h\"" + os.linesep,
+                file=source_file)
+            print("#include <Eigen/Core>" + os.linesep, file=source_file)
 
-            source_file.write(plant_coeffs_type + self.template + " Make" +
-                              self.system_name + "PlantCoeffs() {" + os.linesep)
+            # Write MakePlantCoeffs()
+            self.__write_cpp_func_name(
+                source_file,
+                self.plant_coeffs_type,
+                "PlantCoeffs",
+                in_header=False)
             if self.period_variant:
                 self.__write_cpp_matrix(source_file, self.system.sysc.A,
                                         "Acontinuous")
@@ -84,10 +100,10 @@ class SystemWriter:
                                         "Bcontinuous")
                 self.__write_cpp_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_cpp_matrix(source_file, self.system.sysd.D, "D")
-                source_file.write(
-                    "  return " + plant_coeffs_type + self.template +
-                    "(Acontinuous, Bcontinuous, C, D);" + os.linesep)
-                source_file.write("}" + os.linesep + os.linesep)
+                print(
+                    "  return " + self.plant_coeffs_type +
+                    "(Acontinuous, Bcontinuous, C, D);",
+                    file=source_file)
             else:
                 self.__write_cpp_matrix(source_file, self.system.sysd.A, "A")
                 self.__write_cpp_matrix(source_file,
@@ -96,26 +112,33 @@ class SystemWriter:
                 self.__write_cpp_matrix(source_file, self.system.sysd.B, "B")
                 self.__write_cpp_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_cpp_matrix(source_file, self.system.sysd.D, "D")
-                source_file.write("  return " + plant_coeffs_type +
-                                  self.template + "(A, Ainv, B, C, D);" +
-                                  os.linesep)
-                source_file.write("}" + os.linesep + os.linesep)
+                print(
+                    "  return " + self.plant_coeffs_type +
+                    "(A, Ainv, B, C, D);",
+                    file=source_file)
+            print("}" + os.linesep, file=source_file)
 
-            source_file.write(controller_coeffs_type + self.template + " Make" +
-                              self.system_name + "ControllerCoeffs() {" +
-                              os.linesep)
+            # Write MakeControllerCoeffs()
+            self.__write_cpp_func_name(
+                source_file,
+                self.ctrl_coeffs_type,
+                "ControllerCoeffs",
+                in_header=False)
             self.__write_cpp_matrix(source_file, self.system.K, "K")
             self.__write_cpp_matrix(source_file, self.system.Kff, "Kff")
             self.__write_cpp_matrix(source_file, self.system.u_min, "Umin")
             self.__write_cpp_matrix(source_file, self.system.u_max, "Umax")
-            source_file.write("  return " + controller_coeffs_type +
-                              self.template + "(K, Kff, Umin, Umax);" +
-                              os.linesep)
-            source_file.write("}" + os.linesep + os.linesep)
+            print(
+                "  return " + self.ctrl_coeffs_type + "(K, Kff, Umin, Umax);",
+                file=source_file)
+            print("}" + os.linesep, file=source_file)
 
-            source_file.write(observer_coeffs_type + self.template + " Make" +
-                              self.system_name + "ObserverCoeffs() {" +
-                              os.linesep)
+            # Write MakeObserverCoeffs()
+            self.__write_cpp_func_name(
+                source_file,
+                self.obsv_coeffs_type,
+                "ObserverCoeffs",
+                in_header=False)
             if self.period_variant:
                 self.__write_cpp_matrix(source_file, self.system.Q,
                                         "Qcontinuous")
@@ -123,25 +146,67 @@ class SystemWriter:
                                         "Rcontinuous")
                 self.__write_cpp_matrix(source_file, self.system.P_steady,
                                         "PsteadyState")
-                source_file.write("  return " + observer_coeffs_type +
-                                  self.template + "(Qcontinuous, Rcontinuous," +
-                                  os.linesep +
-                                  " " * len("  return " + observer_coeffs_type +
-                                            self.template + "(") +
-                                  "PsteadyState);" + os.linesep)
-                source_file.write("}" + os.linesep)
+
+                first_line_prefix = "  return " + self.obsv_coeffs_type + "("
+                space_prefix = " " * len(first_line_prefix)
+                print(
+                    first_line_prefix + "Qcontinuous, Rcontinuous,",
+                    file=source_file)
+                print(space_prefix + "PsteadyState);", file=source_file)
             else:
                 self.__write_cpp_matrix(source_file, self.system.L, "L")
-                source_file.write("  return " + observer_coeffs_type +
-                                  self.template + "(L);" + os.linesep)
-                source_file.write("}" + os.linesep)
+                print(
+                    "  return " + self.obsv_coeffs_type + "(L);",
+                    file=source_file)
+            print("}" + os.linesep, file=source_file)
+
+            # Write MakeLoop()
+            self.__write_cpp_func_name(
+                source_file, self.loop_type, "Loop", in_header=False)
+            first_line_prefix = "  return " + self.loop_type + "("
+            space_prefix = " " * len(first_line_prefix)
+            print(
+                first_line_prefix + "Make" + self.system_name +
+                "PlantCoeffs(),",
+                file=source_file)
+            print(
+                space_prefix + "Make" + self.system_name +
+                "ControllerCoeffs(),",
+                file=source_file)
+            print(
+                space_prefix + "Make" + self.system_name + "ObserverCoeffs());",
+                file=source_file)
+            print("}", file=source_file)
+
+    def __write_cpp_func_name(self, cpp_file, return_type, object_suffix,
+                              in_header):
+        """Writes either declaration or definition of C++ factory function.
+
+        Keyword arguments:
+        cpp_file -- file object to which to write name
+        return_type -- string containing the return type
+        object_suffix -- asdf
+        in_header -- if True, print prototype instead of declaration
+        """
+        if in_header:
+            func_suffix = ";"
+        else:
+            func_suffix = " {"
+        func_name = "Make" + self.system_name + object_suffix + "()" + func_suffix
+        if len(return_type + " " + func_name) > 80:
+            print(return_type, file=cpp_file)
+            print(func_name, file=cpp_file)
+        else:
+            print(return_type + " " + func_name, file=cpp_file)
 
     def __write_cpp_matrix(self, cpp_file, matrix, matrix_name):
-        cpp_file.write("  Eigen::Matrix<double, " + str(matrix.shape[0]) +
-                       ", " + str(matrix.shape[1]) + "> " + matrix_name + ";" +
-                       os.linesep)
+        print(
+            "  Eigen::Matrix<double, " + str(matrix.shape[0]) + ", " + str(
+                matrix.shape[1]) + "> " + matrix_name + ";",
+            file=cpp_file)
         for row in range(matrix.shape[0]):
             for col in range(matrix.shape[1]):
-                cpp_file.write("  " + matrix_name + "(" + str(row) + ", " +
-                               str(col) + ") = " + str(matrix[row, col]) + ";" +
-                               os.linesep)
+                print(
+                    "  " + matrix_name + "(" + str(row) + ", " + str(col) +
+                    ") = " + str(matrix[row, col]) + ";",
+                    file=cpp_file)
