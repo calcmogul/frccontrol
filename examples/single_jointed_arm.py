@@ -52,9 +52,13 @@ def main():
     single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "Subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        # plt.figure(1)
-        # single_jointed_arm.plot_pzmaps()
-        pass
+        try:
+            import slycot
+
+            plt.figure(1)
+            single_jointed_arm.plot_pzmaps()
+        except ImportError:  # Slycot unavailable. Can't show pzmaps.
+            pass
     if "--save-plots" in sys.argv:
         plt.savefig("single_jointed_arm_pzmaps.svg")
 

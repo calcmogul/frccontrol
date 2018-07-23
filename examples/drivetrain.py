@@ -83,9 +83,13 @@ def main():
     drivetrain.export_cpp_coeffs("Drivetrain", "Subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        # plt.figure(1)
-        # drivetrain.plot_pzmaps()
-        pass
+        try:
+            import slycot
+
+            plt.figure(1)
+            drivetrain.plot_pzmaps()
+        except ImportError:  # Slycot unavailable. Can't show pzmaps.
+            pass
     if "--save-plots" in sys.argv:
         plt.savefig("drivetrain_pzmaps.svg")
 

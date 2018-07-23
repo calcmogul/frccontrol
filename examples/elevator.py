@@ -48,9 +48,13 @@ def main():
     elevator.export_cpp_coeffs("Elevator", "Subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        # plt.figure(1)
-        # elevator.plot_pzmaps()
-        pass
+        try:
+            import slycot
+
+            plt.figure(1)
+            elevator.plot_pzmaps()
+        except ImportError:  # Slycot unavailable. Can't show pzmaps.
+            pass
     if "--save-plots" in sys.argv:
         plt.savefig("elevator_pzmaps.svg")
 
