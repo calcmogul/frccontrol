@@ -136,14 +136,22 @@ class System:
         observer poles.
         """
         # Plot pole-zero map of open-loop system
+        print("Open-loop poles =", self.sysd.pole())
+        print("Open-loop zeroes =", self.sysd.zero())
         plt.subplot(2, 2, 1)
         frccnt.dpzmap(self.sysd, title="Open-loop system")
 
         # Plot pole-zero map of closed-loop system
+        sys = frccnt.closed_loop_ctrl(self)
+        print("Closed-loop poles =", sys.pole())
+        print("Closed-loop zeroes =", sys.zero())
         plt.subplot(2, 2, 2)
-        frccnt.dpzmap(frccnt.closed_loop_ctrl(self), title="Closed-loop system")
+        frccnt.dpzmap(sys, title="Closed-loop system")
 
         # Plot observer poles
+        sys = cnt.StateSpace(self.sysd.A - self.L * self.sysd.C, self.sysd.B,
+                             self.sysd.C, self.sysd.D)
+        print("Observer poles =", sys.pole())
         plt.subplot(2, 2, 3)
         frccnt.plot_observer_poles(self)
 
