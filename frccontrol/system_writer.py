@@ -41,7 +41,7 @@ class SystemWriter:
 
     def write_cpp_header(self):
         """Writes C++ header file."""
-        prefix = "#include <Controllers/"
+        prefix = "#include <frc/controllers/"
         headers = []
         headers.append(prefix + self.plant_coeffs_header + ".h>")
         headers.append(prefix + self.ctrl_coeffs_header + ".h>")
