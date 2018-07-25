@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
+# Avoid needing display if plots aren't being shown
+import sys
+if "--noninteractive" in sys.argv:
+    import matplotlib as mpl
+    mpl.use("svg")
+
 import frccontrol as frccnt
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 
 
 class Flywheel(frccnt.System):
