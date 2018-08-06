@@ -47,8 +47,11 @@ def closed_loop_ctrl(system):
     StateSpace instance representing closed-loop controller.
     """
     return cnt.StateSpace(
-        system.sysd.A - system.sysd.B * system.K, system.sysd.B * system.K,
-        system.sysd.C - system.sysd.D * system.K, system.sysd.D * system.K)
+        system.sysd.A - system.sysd.B * system.K,
+        system.sysd.B * system.K,
+        system.sysd.C - system.sysd.D * system.K,
+        system.sysd.D * system.K,
+    )
 
 
 def plot_observer_poles(system):
@@ -57,6 +60,10 @@ def plot_observer_poles(system):
     Keyword arguments:
     system -- a System instance
     """
-    sys_cl = cnt.StateSpace(system.sysd.A - system.L * system.sysd.C,
-                            system.sysd.B, system.sysd.C, system.sysd.D)
+    sys_cl = cnt.StateSpace(
+        system.sysd.A - system.L * system.sysd.C,
+        system.sysd.B,
+        system.sysd.C,
+        system.sysd.D,
+    )
     dpzmap(sys_cl, title="Observer poles")

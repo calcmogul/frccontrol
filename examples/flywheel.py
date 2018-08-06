@@ -2,8 +2,10 @@
 
 # Avoid needing display if plots aren't being shown
 import sys
+
 if "--noninteractive" in sys.argv:
     import matplotlib as mpl
+
     mpl.use("svg")
 
 import frccontrol as frccnt
@@ -13,7 +15,6 @@ import numpy as np
 
 
 class Flywheel(frccnt.System):
-
     def __init__(self, dt):
         """Flywheel subsystem.
 
@@ -31,8 +32,9 @@ class Flywheel(frccnt.System):
         # Gear ratio
         self.G = 12.0 / 18.0
 
-        self.model = frccnt.models.flywheel(frccnt.models.MOTOR_775PRO,
-                                            self.num_motors, self.J, self.G)
+        self.model = frccnt.models.flywheel(
+            frccnt.models.MOTOR_775PRO, self.num_motors, self.J, self.G
+        )
         frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
 
         q = [9.42]
@@ -62,7 +64,7 @@ def main():
     l0 = 0.1
     l1 = l0 + 5.0
     l2 = l1 + 0.1
-    t = np.linspace(0, l2 + 5.0, (l2 + 5.0) / dt)
+    t = np.arange(0, l2 + 5.0, dt)
 
     refs = []
 

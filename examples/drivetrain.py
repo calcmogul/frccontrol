@@ -2,8 +2,10 @@
 
 # Avoid needing display if plots aren't being shown
 import sys
+
 if "--noninteractive" in sys.argv:
     import matplotlib as mpl
+
     mpl.use("svg")
 
 import frccontrol as frccnt
@@ -12,15 +14,18 @@ import numpy as np
 
 
 class Drivetrain(frccnt.System):
-
     def __init__(self, dt):
         """Drivetrain subsystem.
 
         Keyword arguments:
         dt -- time between model/controller updates
         """
-        state_labels = [("Left position", "m"), ("Left velocity", "m/s"),
-                        ("Right position", "m"), ("Right velocity", "m/s")]
+        state_labels = [
+            ("Left position", "m"),
+            ("Left velocity", "m/s"),
+            ("Right position", "m"),
+            ("Right velocity", "m/s"),
+        ]
         u_labels = [("Left voltage", "V"), ("Right voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
@@ -50,9 +55,16 @@ class Drivetrain(frccnt.System):
             self.Gl = Ghigh
             self.Gr = Ghigh
 
-        self.model = frccnt.models.drivetrain(frccnt.models.MOTOR_CIM,
-                                              self.num_motors, self.m, self.r,
-                                              self.rb, self.J, self.Gl, self.Gr)
+        self.model = frccnt.models.drivetrain(
+            frccnt.models.MOTOR_CIM,
+            self.num_motors,
+            self.m,
+            self.r,
+            self.rb,
+            self.J,
+            self.Gl,
+            self.Gr,
+        )
         u_min = np.matrix([[-12.0], [-12.0]])
         u_max = np.matrix([[12.0], [12.0]])
         frccnt.System.__init__(self, self.model, u_min, u_max, dt)
@@ -70,8 +82,9 @@ class Drivetrain(frccnt.System):
 
         qff_pos = 0.005
         qff_vel = 1.0
-        self.design_two_state_feedforward([qff_pos, qff_vel, qff_pos, qff_vel],
-                                          [12.0, 12.0])
+        self.design_two_state_feedforward(
+            [qff_pos, qff_vel, qff_pos, qff_vel], [12.0, 12.0]
+        )
 
         q_pos = 0.05
         q_vel = 1.0
@@ -102,7 +115,7 @@ def main():
     l0 = 0.1
     l1 = l0 + 5.0
     l2 = l1 + 0.1
-    t = np.linspace(0, l2 + 5.0, (l2 + 5.0) / dt)
+    t = np.arange(0, l2 + 5.0, dt)
 
     refs = []
 

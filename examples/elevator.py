@@ -2,8 +2,10 @@
 
 # Avoid needing display if plots aren't being shown
 import sys
+
 if "--noninteractive" in sys.argv:
     import matplotlib as mpl
+
     mpl.use("svg")
 
 import frccontrol as frccnt
@@ -12,7 +14,6 @@ import numpy as np
 
 
 class Elevator(frccnt.System):
-
     def __init__(self, dt):
         """Elevator subsystem.
 
@@ -33,7 +34,8 @@ class Elevator(frccnt.System):
         self.G = 42.0 / 12.0 * 40.0 / 14.0
 
         self.model = frccnt.models.elevator(
-            frccnt.models.MOTOR_CIM, self.num_motors, self.m, self.r, self.G)
+            frccnt.models.MOTOR_CIM, self.num_motors, self.m, self.r, self.G
+        )
         frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
 
         q = [0.02, 0.4]
@@ -67,7 +69,7 @@ def main():
     l0 = 0.1
     l1 = l0 + 5.0
     l2 = l1 + 0.1
-    t = np.linspace(0, l2 + 5.0, (l2 + 5.0) / dt)
+    t = np.arange(0, l2 + 5.0, dt)
 
     refs = []
 

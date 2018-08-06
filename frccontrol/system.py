@@ -12,7 +12,6 @@ from . import system_writer
 
 
 class System:
-
     def __init__(self, sysc, u_min, u_max, dt):
         """Sets up the matrices for a state-space model.
 
@@ -54,8 +53,11 @@ class System:
 
     def correct_observer(self):
         """Runs the correct step of the observer update."""
-        self.x_hat += np.linalg.inv(self.sysd.A) * self.L * (
-            self.y - self.sysd.C * self.x_hat - self.sysd.D * self.u)
+        self.x_hat += (
+            np.linalg.inv(self.sysd.A)
+            * self.L
+            * (self.y - self.sysd.C * self.x_hat - self.sysd.D * self.u)
+        )
 
     def design_dlqr_controller(self, Q_elems, R_elems):
         """Design a discrete-time LQR controller for the system.
@@ -128,8 +130,9 @@ class System:
         #   (B u - (r_{n+1} - A r_n))^T Q (B u - (r_{n+1} - A r_n)) + u^T R u
         Q = self.__make_cost_matrix(Q_elems)
         R = self.__make_cost_matrix(R_elems)
-        self.Kff = np.linalg.inv(self.sysd.B.T * Q * self.sysd.B +
-                                 R.T) * self.sysd.B.T * Q
+        self.Kff = (
+            np.linalg.inv(self.sysd.B.T * Q * self.sysd.B + R.T) * self.sysd.B.T * Q
+        )
 
     def plot_pzmaps(self):
         """Plots pole-zero maps of open-loop system, closed-loop system, and
@@ -149,8 +152,9 @@ class System:
         frccnt.dpzmap(sys, title="Closed-loop system")
 
         # Plot observer poles
-        sys = cnt.StateSpace(self.sysd.A - self.L * self.sysd.C, self.sysd.B,
-                             self.sysd.C, self.sysd.D)
+        sys = cnt.StateSpace(
+            self.sysd.A - self.L * self.sysd.C, self.sysd.B, self.sysd.C, self.sysd.D
+        )
         print("Observer poles =", sys.pole())
         plt.subplot(2, 2, 3)
         frccnt.plot_observer_poles(self)
@@ -228,8 +232,11 @@ class System:
 
     def __update_observer(self):
         """Updates the observer given the current value of u."""
-        self.x_hat = self.sysd.A * self.x_hat + self.sysd.B * self.u + self.L * (
-            self.y - self.sysd.C * self.x_hat - self.sysd.D * self.u)
+        self.x_hat = (
+            self.sysd.A * self.x_hat
+            + self.sysd.B * self.u
+            + self.L * (self.y - self.sysd.C * self.x_hat - self.sysd.D * self.u)
+        )
 
     def __make_cost_matrix(self, elems):
         """Creates a cost matrix from the given vector for use with LQR.
@@ -266,10 +273,7 @@ class System:
         """
         return np.diag(np.square(elems))
 
-    def export_cpp_coeffs(self,
-                          name,
-                          header_path_prefix="",
-                          period_variant=False):
+    def export_cpp_coeffs(self, name, header_path_prefix="", period_variant=False):
         """Exports matrices to pair of C++ source files.
 
         Keyword arguments:
@@ -278,7 +282,6 @@ class System:
         period_variant -- True to use PeriodVariantLoop, False to use
                           StateSpaceLoop
         """
-        system_writer = frccnt.system_writer.SystemWriter(
-            self, name, period_variant)
+        system_writer = frccnt.system_writer.SystemWriter(self, name, period_variant)
         system_writer.write_cpp_header()
         system_writer.write_cpp_source(header_path_prefix)

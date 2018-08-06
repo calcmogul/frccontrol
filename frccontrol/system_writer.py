@@ -6,7 +6,6 @@ import os
 
 
 class SystemWriter:
-
     def __init__(self, system, system_name, period_variant=False):
         """Exports matrices to pair of C++ source files.
 
@@ -18,8 +17,15 @@ class SystemWriter:
         """
         self.system = system
         self.system_name = system_name
-        template = "<" + str(system.sysd.A.shape[0]) + ", " + str(
-            system.sysd.B.shape[1]) + ", " + str(system.sysd.C.shape[0]) + ">"
+        template = (
+            "<"
+            + str(system.sysd.A.shape[0])
+            + ", "
+            + str(system.sysd.B.shape[1])
+            + ", "
+            + str(system.sysd.C.shape[0])
+            + ">"
+        )
 
         self.period_variant = period_variant
         if period_variant:
@@ -54,22 +60,17 @@ class SystemWriter:
                 print(header, file=header_file)
             header_file.write(os.linesep)
             self.__write_cpp_func_name(
-                header_file,
-                self.plant_coeffs_type,
-                "PlantCoeffs",
-                in_header=True)
+                header_file, self.plant_coeffs_type, "PlantCoeffs", in_header=True
+            )
             self.__write_cpp_func_name(
-                header_file,
-                self.ctrl_coeffs_type,
-                "ControllerCoeffs",
-                in_header=True)
+                header_file, self.ctrl_coeffs_type, "ControllerCoeffs", in_header=True
+            )
             self.__write_cpp_func_name(
-                header_file,
-                self.obsv_coeffs_type,
-                "ObserverCoeffs",
-                in_header=True)
+                header_file, self.obsv_coeffs_type, "ObserverCoeffs", in_header=True
+            )
             self.__write_cpp_func_name(
-                header_file, self.loop_type, "Loop", in_header=True)
+                header_file, self.loop_type, "Loop", in_header=True
+            )
 
     def write_cpp_source(self, header_path_prefix):
         """Writes C++ source file.
@@ -82,104 +83,99 @@ class SystemWriter:
 
         with open(self.system_name + "Coeffs.cpp", "w") as source_file:
             print(
-                "#include \"" + header_path_prefix + self.system_name +
-                "Coeffs.h\"" + os.linesep,
-                file=source_file)
+                '#include "'
+                + header_path_prefix
+                + self.system_name
+                + 'Coeffs.h"'
+                + os.linesep,
+                file=source_file,
+            )
             print("#include <Eigen/Core>" + os.linesep, file=source_file)
 
             # Write MakePlantCoeffs()
             self.__write_cpp_func_name(
-                source_file,
-                self.plant_coeffs_type,
-                "PlantCoeffs",
-                in_header=False)
+                source_file, self.plant_coeffs_type, "PlantCoeffs", in_header=False
+            )
             if self.period_variant:
-                self.__write_cpp_matrix(source_file, self.system.sysc.A,
-                                        "Acontinuous")
-                self.__write_cpp_matrix(source_file, self.system.sysc.B,
-                                        "Bcontinuous")
+                self.__write_cpp_matrix(source_file, self.system.sysc.A, "Acontinuous")
+                self.__write_cpp_matrix(source_file, self.system.sysc.B, "Bcontinuous")
                 self.__write_cpp_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_cpp_matrix(source_file, self.system.sysd.D, "D")
                 print(
-                    "  return " + self.plant_coeffs_type +
-                    "(Acontinuous, Bcontinuous, C, D);",
-                    file=source_file)
+                    "  return "
+                    + self.plant_coeffs_type
+                    + "(Acontinuous, Bcontinuous, C, D);",
+                    file=source_file,
+                )
             else:
                 self.__write_cpp_matrix(source_file, self.system.sysd.A, "A")
-                self.__write_cpp_matrix(source_file,
-                                        np.linalg.inv(self.system.sysd.A),
-                                        "Ainv")
+                self.__write_cpp_matrix(
+                    source_file, np.linalg.inv(self.system.sysd.A), "Ainv"
+                )
                 self.__write_cpp_matrix(source_file, self.system.sysd.B, "B")
                 self.__write_cpp_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_cpp_matrix(source_file, self.system.sysd.D, "D")
                 print(
-                    "  return " + self.plant_coeffs_type +
-                    "(A, Ainv, B, C, D);",
-                    file=source_file)
+                    "  return " + self.plant_coeffs_type + "(A, Ainv, B, C, D);",
+                    file=source_file,
+                )
             print("}" + os.linesep, file=source_file)
 
             # Write MakeControllerCoeffs()
             self.__write_cpp_func_name(
-                source_file,
-                self.ctrl_coeffs_type,
-                "ControllerCoeffs",
-                in_header=False)
+                source_file, self.ctrl_coeffs_type, "ControllerCoeffs", in_header=False
+            )
             self.__write_cpp_matrix(source_file, self.system.K, "K")
             self.__write_cpp_matrix(source_file, self.system.Kff, "Kff")
             self.__write_cpp_matrix(source_file, self.system.u_min, "Umin")
             self.__write_cpp_matrix(source_file, self.system.u_max, "Umax")
             print(
                 "  return " + self.ctrl_coeffs_type + "(K, Kff, Umin, Umax);",
-                file=source_file)
+                file=source_file,
+            )
             print("}" + os.linesep, file=source_file)
 
             # Write MakeObserverCoeffs()
             self.__write_cpp_func_name(
-                source_file,
-                self.obsv_coeffs_type,
-                "ObserverCoeffs",
-                in_header=False)
+                source_file, self.obsv_coeffs_type, "ObserverCoeffs", in_header=False
+            )
             if self.period_variant:
-                self.__write_cpp_matrix(source_file, self.system.Q,
-                                        "Qcontinuous")
-                self.__write_cpp_matrix(source_file, self.system.R,
-                                        "Rcontinuous")
-                self.__write_cpp_matrix(source_file, self.system.P_steady,
-                                        "PsteadyState")
+                self.__write_cpp_matrix(source_file, self.system.Q, "Qcontinuous")
+                self.__write_cpp_matrix(source_file, self.system.R, "Rcontinuous")
+                self.__write_cpp_matrix(
+                    source_file, self.system.P_steady, "PsteadyState"
+                )
 
                 first_line_prefix = "  return " + self.obsv_coeffs_type + "("
                 space_prefix = " " * len(first_line_prefix)
-                print(
-                    first_line_prefix + "Qcontinuous, Rcontinuous,",
-                    file=source_file)
+                print(first_line_prefix + "Qcontinuous, Rcontinuous,", file=source_file)
                 print(space_prefix + "PsteadyState);", file=source_file)
             else:
                 self.__write_cpp_matrix(source_file, self.system.L, "L")
-                print(
-                    "  return " + self.obsv_coeffs_type + "(L);",
-                    file=source_file)
+                print("  return " + self.obsv_coeffs_type + "(L);", file=source_file)
             print("}" + os.linesep, file=source_file)
 
             # Write MakeLoop()
             self.__write_cpp_func_name(
-                source_file, self.loop_type, "Loop", in_header=False)
+                source_file, self.loop_type, "Loop", in_header=False
+            )
             first_line_prefix = "  return " + self.loop_type + "("
             space_prefix = " " * len(first_line_prefix)
             print(
-                first_line_prefix + "Make" + self.system_name +
-                "PlantCoeffs(),",
-                file=source_file)
+                first_line_prefix + "Make" + self.system_name + "PlantCoeffs(),",
+                file=source_file,
+            )
             print(
-                space_prefix + "Make" + self.system_name +
-                "ControllerCoeffs(),",
-                file=source_file)
+                space_prefix + "Make" + self.system_name + "ControllerCoeffs(),",
+                file=source_file,
+            )
             print(
                 space_prefix + "Make" + self.system_name + "ObserverCoeffs());",
-                file=source_file)
+                file=source_file,
+            )
             print("}", file=source_file)
 
-    def __write_cpp_func_name(self, cpp_file, return_type, object_suffix,
-                              in_header):
+    def __write_cpp_func_name(self, cpp_file, return_type, object_suffix, in_header):
         """Writes either declaration or definition of C++ factory function.
 
         Keyword arguments:
@@ -201,12 +197,26 @@ class SystemWriter:
 
     def __write_cpp_matrix(self, cpp_file, matrix, matrix_name):
         print(
-            "  Eigen::Matrix<double, " + str(matrix.shape[0]) + ", " + str(
-                matrix.shape[1]) + "> " + matrix_name + ";",
-            file=cpp_file)
+            "  Eigen::Matrix<double, "
+            + str(matrix.shape[0])
+            + ", "
+            + str(matrix.shape[1])
+            + "> "
+            + matrix_name
+            + ";",
+            file=cpp_file,
+        )
         for row in range(matrix.shape[0]):
             for col in range(matrix.shape[1]):
                 print(
-                    "  " + matrix_name + "(" + str(row) + ", " + str(col) +
-                    ") = " + str(matrix[row, col]) + ";",
-                    file=cpp_file)
+                    "  "
+                    + matrix_name
+                    + "("
+                    + str(row)
+                    + ", "
+                    + str(col)
+                    + ") = "
+                    + str(matrix[row, col])
+                    + ";",
+                    file=cpp_file,
+                )

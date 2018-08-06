@@ -3,9 +3,9 @@ import numpy as np
 
 
 class DcBrushedMotor:
-
-    def __init__(self, nominal_voltage, stall_torque, stall_current,
-                 free_current, free_speed):
+    def __init__(
+        self, nominal_voltage, stall_torque, stall_current, free_current, free_speed
+    ):
         """Holds the constants for a DC brushed motor.
 
         Keyword arguments:
@@ -27,8 +27,7 @@ class DcBrushedMotor:
         self.R = self.nominal_voltage / self.stall_current
 
         # Motor velocity constant
-        self.Kv = self.free_speed / (
-            self.nominal_voltage - self.R * self.free_current)
+        self.Kv = self.free_speed / (self.nominal_voltage - self.R * self.free_current)
 
         # Torque constant
         self.Kt = self.stall_torque / self.stall_current
@@ -63,10 +62,13 @@ def gearbox(motor, num_motors):
     """Returns a DcBrushedMotor with the same characteristics as the specified
     number of motors in a gearbox.
     """
-    return DcBrushedMotor(motor.nominal_voltage,
-                          motor.stall_torque * num_motors, motor.stall_current,
-                          motor.free_current,
-                          motor.free_speed / (2.0 * np.pi) * 60)
+    return DcBrushedMotor(
+        motor.nominal_voltage,
+        motor.stall_torque * num_motors,
+        motor.stall_current,
+        motor.free_current,
+        motor.free_speed / (2.0 * np.pi) * 60,
+    )
 
 
 def elevator(motor, num_motors, m, r, G):
@@ -118,7 +120,7 @@ def flywheel(motor, num_motors, J, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.matrix([[-G**2 * motor.Kt / (motor.Kv * motor.R * J)]])
+    A = np.matrix([[-G ** 2 * motor.Kt / (motor.Kv * motor.R * J)]])
     B = np.matrix([[G * motor.Kt / (motor.R * J)]])
     C = np.matrix([[1]])
     D = np.matrix([[0]])
@@ -149,9 +151,9 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
     """
     motor = gearbox(motor, num_motors)
 
-    C1 = -Gl**2 * motor.Kt / (motor.Kv * motor.R * r**2)
+    C1 = -Gl ** 2 * motor.Kt / (motor.Kv * motor.R * r ** 2)
     C2 = Gl * motor.Kt / (motor.R * r)
-    C3 = -Gr**2 * motor.Kt / (motor.Kv * motor.R * r**2)
+    C3 = -Gr ** 2 * motor.Kt / (motor.Kv * motor.R * r ** 2)
     C4 = Gr * motor.Kt / (motor.R * r)
     # yapf: disable
     A = np.matrix([[0, 1, 0, 0],
@@ -189,7 +191,7 @@ def single_jointed_arm(motor, num_motors, J, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.matrix([[0, 1], [0, -G**2 * motor.Kt / (motor.Kv * motor.R * J)]])
+    A = np.matrix([[0, 1], [0, -G ** 2 * motor.Kt / (motor.Kv * motor.R * J)]])
     B = np.matrix([[0], [G * motor.Kt / (motor.R * J)]])
     C = np.matrix([[1, 0]])
     D = np.matrix([[0]])

@@ -2,8 +2,10 @@
 
 # Avoid needing display if plots aren't being shown
 import sys
+
 if "--noninteractive" in sys.argv:
     import matplotlib as mpl
+
     mpl.use("svg")
 
 import frccontrol as frccnt
@@ -13,7 +15,6 @@ import numpy as np
 
 
 class SingleJointedArm(frccnt.System):
-
     def __init__(self, dt):
         """Single-jointed arm subsystem.
 
@@ -31,12 +32,13 @@ class SingleJointedArm(frccnt.System):
         # Length of arm in m
         self.l = 1.2192
         # Arm moment of inertia in kg-m^2
-        self.J = 1 / 3 * self.m * self.l**2
+        self.J = 1 / 3 * self.m * self.l ** 2
         # Gear ratio
         self.G = 1.0 / 20.0
 
         self.model = frccnt.models.single_jointed_arm(
-            frccnt.models.MOTOR_CIM, self.num_motors, self.J, self.G)
+            frccnt.models.MOTOR_CIM, self.num_motors, self.J, self.G
+        )
         frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
 
         q_pos = 0.01745
@@ -71,7 +73,7 @@ def main():
     l0 = 0.1
     l1 = l0 + 5.0
     l2 = l1 + 0.1
-    t = np.linspace(0, l2 + 5.0, (l2 + 5.0) / dt)
+    t = np.arange(0, l2 + 5.0, dt)
 
     refs = []
 
