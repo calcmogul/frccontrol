@@ -90,14 +90,14 @@ def elevator(motor, num_motors, m, r, G):
     """
     motor = gearbox(motor, num_motors)
 
-    # yapf: disable
+    # fmt: off
     A = np.matrix([[0, 1],
                    [0, -G**2 * motor.Kt / (motor.R**2 * r * m * motor.Kv)]])
     B = np.matrix([[0],
                    [G * motor.Kt / (motor.R * r * m)]])
     C = np.matrix([[1, 0]])
     D = np.matrix([[0]])
-    # yapf: enable
+    # fmt: on
 
     return cnt.ss(A, B, C, D)
 
@@ -155,7 +155,7 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
     C2 = Gl * motor.Kt / (motor.R * r)
     C3 = -Gr ** 2 * motor.Kt / (motor.Kv * motor.R * r ** 2)
     C4 = Gr * motor.Kt / (motor.R * r)
-    # yapf: disable
+    # fmt: off
     A = np.matrix([[0, 1, 0, 0],
                    [0, (1 / m - rb**2 / J) * C1, 0, (1 / m + rb**2 / J) * C3],
                    [0, 0, 0, 1],
@@ -168,7 +168,7 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
                    [0, 0, 1, 0]])
     D = np.matrix([[0, 0],
                    [0, 0]])
-    # yapf: enable
+    # fmt: on
 
     return cnt.ss(A, B, C, D)
 
