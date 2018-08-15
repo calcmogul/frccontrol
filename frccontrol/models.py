@@ -157,9 +157,9 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
     C4 = Gr * motor.Kt / (motor.R * r)
     # fmt: off
     A = np.matrix([[0, 1, 0, 0],
-                   [0, (1 / m - rb**2 / J) * C1, 0, (1 / m + rb**2 / J) * C3],
+                   [0, (1 / m + rb**2 / J) * C1, 0, (1 / m - rb**2 / J) * C3],
                    [0, 0, 0, 1],
-                   [0, (1 / m + rb**2 / J) * C1, 0, (1 / m - rb**2 / J) * C3]])
+                   [0, (1 / m - rb**2 / J) * C1, 0, (1 / m + rb**2 / J) * C3]])
     B = np.matrix([[0, 0],
                    [(1 / m + rb**2 / J) * C2, (1 / m - rb**2 / J) * C4],
                    [0, 0],
@@ -174,7 +174,7 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
 
 
 def single_jointed_arm(motor, num_motors, J, G):
-    """Returns the state-space model for a flywheel.
+    """Returns the state-space model for a single-jointed arm.
 
     States: [[angle, angular velocity]]
     Inputs: [[voltage]]
