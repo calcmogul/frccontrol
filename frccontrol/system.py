@@ -230,10 +230,10 @@ class System:
 
         for i in range(self.sysd.inputs):
             plt.subplot(subplot_max, 1, self.sysd.states + i + 1)
-            plt.xlabel("Time (s)")
             plt.ylabel(self.u_labels[i])
             plt.plot(t, self.extract_row(u_rec, i), label="Control effort")
             plt.legend()
+        plt.xlabel("Time (s)")
 
     def set_plot_labels(self, state_labels, u_labels):
         """Sets label data for time-domain response plots.
