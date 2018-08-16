@@ -24,25 +24,35 @@ class System:
         self.sysc = sysc
         self.sysd = sysc.sample(dt)  # Discretize model
 
-        # Model matrices
-        self.x = np.zeros((self.sysc.A.shape[0], 1))
-        self.u = np.zeros((self.sysc.B.shape[1], 1))
-        self.y = np.zeros((self.sysc.C.shape[0], 1))
         self.u_min = np.asmatrix(u_min)
         self.u_max = np.asmatrix(u_max)
 
         # Controller matrices
-        self.r = np.zeros((self.sysc.A.shape[0], 1))
         self.K = np.zeros((self.sysc.B.shape[1], self.sysc.B.shape[0]))
         self.Kff = np.zeros((self.sysc.A.shape[0], self.sysc.A.shape[1]))
 
         # Observer matrices
-        self.x_hat = np.zeros((self.sysc.A.shape[0], 1))
         self.L = np.zeros((self.sysc.A.shape[0], self.sysc.C.shape[0]))
+
+        self.reset()
+
+    def reset(self):
+        # Model matrices
+        self.x = np.zeros((self.sysc.A.shape[0], 1))
+        self.u = np.zeros((self.sysc.B.shape[1], 1))
+        self.y = np.zeros((self.sysc.C.shape[0], 1))
+
+        # Controller matrices
+        self.r = np.zeros((self.sysc.A.shape[0], 1))
+
+        # Observer matrices
+        self.x_hat = np.zeros((self.sysc.A.shape[0], 1))
 
     def update(self):
         """Advance the model by one timestep."""
-        self.u = np.clip(self.K * (self.r - self.x_hat), self.u_min, self.u_max)
+        u = self.K * (self.r - self.x_hat)
+        uff = self.Kff * (self.r - self.sysd.A * self.r)
+        self.u = np.clip(u + uff, self.u_min, self.u_max)
         self.__update_observer()
         self.x = self.sysd.A * self.x + self.sysd.B * self.u
         self.y = self.sysd.C * self.x + self.sysd.D * self.u
@@ -174,9 +184,14 @@ class System:
     def generate_time_responses(self, t, refs):
         """Generate time-domain responses of the system and the control inputs.
 
+        Returns:
+        state_rec -- recording of states from generate_time_responses()
+        ref_rec -- recording of references from generate_time_responses()
+        u_rec -- recording of inputs from generate_time_responses()
+
         Keyword arguments:
-        time -- list of timesteps corresponding to references.
-        refs -- list of tuples of time-reference pairs.
+        time -- list of timesteps corresponding to references
+        refs -- list of reference vectors, one for each time
         """
         state_rec = np.zeros((self.sysd.states, 0))
         ref_rec = np.zeros((self.sysd.states, 0))
@@ -194,15 +209,15 @@ class System:
 
         return state_rec, ref_rec, u_rec
 
-    def plot_time_responses(self, t, refs):
+    def plot_time_responses(self, t, state_rec, ref_rec, u_rec):
         """Plots time-domain responses of the system and the control inputs.
 
         Keyword arguments:
         time -- list of timesteps corresponding to references.
-        refs -- list of tuples of time-reference pairs.
+        state_rec -- recording of states from generate_time_responses()
+        ref_rec -- recording of references from generate_time_responses()
+        u_rec -- recording of inputs from generate_time_responses()
         """
-        state_rec, ref_rec, u_rec = self.generate_time_responses(t, refs)
-
         subplot_max = self.sysd.states + self.sysd.inputs
         for i in range(self.sysd.states):
             plt.subplot(subplot_max, 1, i + 1)

@@ -111,27 +111,20 @@ def main():
     if "--save-plots" in sys.argv:
         plt.savefig("drivetrain_pzmaps.svg")
 
-    # Set up graphing
-    l0 = 0.1
-    l1 = l0 + 5.0
-    l2 = l1 + 0.1
-    t = np.arange(0, l2 + 5.0, dt)
-
-    refs = []
+    t, xprof, vprof, aprof = frccnt.generate_s_curve_profile(
+        max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
+    )
 
     # Generate references for simulation
+    refs = []
     for i in range(len(t)):
-        if t[i] < l0:
-            r = np.matrix([[0.0], [0.0], [0.0], [0.0]])
-        elif t[i] < l1:
-            r = np.matrix([[1.524], [0.0], [0.0], [0.0]])
-        else:
-            r = np.matrix([[0.0], [0.0], [0.0], [0.0]])
+        r = np.matrix([[xprof[i]], [vprof[i]], [xprof[i]], [vprof[i]]])
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(2)
-        drivetrain.plot_time_responses(t, refs)
+        state_rec, ref_rec, u_rec = drivetrain.generate_time_responses(t, refs)
+        drivetrain.plot_time_responses(t, state_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
         plt.savefig("drivetrain_response.svg")
     if "--noninteractive" not in sys.argv:

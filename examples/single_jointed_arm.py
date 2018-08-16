@@ -34,7 +34,7 @@ class SingleJointedArm(frccnt.System):
         # Arm moment of inertia in kg-m^2
         self.J = 1 / 3 * self.m * self.l ** 2
         # Gear ratio
-        self.G = 1.0 / 20.0
+        self.G = 1.0 / 2.0
 
         self.model = frccnt.models.single_jointed_arm(
             frccnt.models.MOTOR_CIM, self.num_motors, self.J, self.G
@@ -69,29 +69,20 @@ def main():
     if "--save-plots" in sys.argv:
         plt.savefig("single_jointed_arm_pzmaps.svg")
 
-    # Set up graphing
-    l0 = 0.1
-    l1 = l0 + 5.0
-    l2 = l1 + 0.1
-    t = np.arange(0, l2 + 5.0, dt)
-
-    refs = []
+    t, xprof, vprof, aprof = frccnt.generate_s_curve_profile(
+        max_v=0.5, max_a=1, time_to_max_a=0.5, dt=dt, goal=1.04
+    )
 
     # Generate references for simulation
+    refs = []
     for i in range(len(t)):
-        if t[i] < l0:
-            r = np.matrix([[0.0], [0.0]])
-        elif t[i] < l1:
-            r_pos = min(0.8726646 * (t[i] - l0) / (l1 - l0), 0.8726646)
-            r_vel = 0.8726646 / (l1 - l0)
-            r = np.matrix([[r_pos], [r_vel]])
-        else:
-            r = np.matrix([[0.0], [0.0]])
+        r = np.matrix([[xprof[i]], [vprof[i]]])
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(2)
-        single_jointed_arm.plot_time_responses(t, refs)
+        state_rec, ref_rec, u_rec = single_jointed_arm.generate_time_responses(t, refs)
+        single_jointed_arm.plot_time_responses(t, state_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
         plt.savefig("single_jointed_arm_response.svg")
     if "--noninteractive" not in sys.argv:
