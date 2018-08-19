@@ -19,9 +19,8 @@ def kalmd(sys, Q, R):
     observability_rank = np.linalg.matrix_rank(cnt.obsv(sys.A, sys.C))
     if observability_rank != m:
         print(
-            "Warning: Observability of %d != %d, unobservable state",
-            observability_rank,
-            m,
+            "Warning: Observability of %d != %d, unobservable state"
+            % (observability_rank, m)
         )
 
     # Compute the steady state covariance matrix

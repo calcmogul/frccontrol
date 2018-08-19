@@ -1,3 +1,4 @@
+import control as cnt
 import numpy as np
 import scipy as sp
 
@@ -17,6 +18,14 @@ def dlqr(sys, Q, R):
     Returns:
     numpy.matrix(states x inputs), K
     """
+    m = sys.A.shape[0]
+
+    controllability_rank = np.linalg.matrix_rank(cnt.ctrb(sys.A, sys.B))
+    if controllability_rank != m:
+        print(
+            "Warning: Controllability of %d != %d, uncontrollable state"
+            % (controllability_rank, m)
+        )
 
     # P = A.T * P * A - (A.T * P * B) * np.linalg.inv(R + B.T * P * B) *
     #     (B.T * P.T * A) + Q
