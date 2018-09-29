@@ -288,15 +288,24 @@ class System:
         """
         return np.diag(np.square(elems))
 
-    def export_cpp_coeffs(self, name, header_path_prefix="", period_variant=False):
+    def export_cpp_coeffs(
+        self,
+        class_name,
+        header_path_prefix="",
+        header_extension="hpp",
+        period_variant=False,
+    ):
         """Exports matrices to pair of C++ source files.
 
         Keyword arguments:
-        name -- subsystem class name in camel case
+        class_name -- subsystem class name in camel case
         header_path_prefix -- path prefix in which header exists
+        header_extension -- file extension of header file (default: "hpp")
         period_variant -- True to use PeriodVariantLoop, False to use
                           StateSpaceLoop
         """
-        system_writer = frccnt.system_writer.SystemWriter(self, name, period_variant)
+        system_writer = frccnt.system_writer.SystemWriter(
+            self, class_name, header_path_prefix, header_extension, period_variant
+        )
         system_writer.write_cpp_header()
-        system_writer.write_cpp_source(header_path_prefix)
+        system_writer.write_cpp_source()

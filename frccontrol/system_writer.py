@@ -6,17 +6,28 @@ import os
 
 
 class SystemWriter:
-    def __init__(self, system, system_name, period_variant=False):
+    def __init__(
+        self,
+        system,
+        class_name,
+        header_path_prefix,
+        header_extension,
+        period_variant=False,
+    ):
         """Exports matrices to pair of C++ source files.
 
         Keyword arguments:
         system -- System object
-        system_name -- subsystem class name in camel case
+        class_name -- subsystem class name in camel case
+        header_path_prefix -- path prefix in which header exists
+        header_extension -- file extension of header file
         period_variant -- True to use PeriodVariantLoop, False to use
                           StateSpaceLoop
         """
         self.system = system
-        self.system_name = system_name
+        self.class_name = class_name
+        self.header_path_prefix = header_path_prefix
+        self.header_extension = header_extension
         template = (
             "<"
             + str(system.sysd.A.shape[0])
@@ -47,14 +58,16 @@ class SystemWriter:
 
     def write_cpp_header(self):
         """Writes C++ header file."""
-        prefix = "#include <frc/controllers/"
+        prefix = "#include <frc/controller/"
         headers = []
         headers.append(prefix + self.plant_coeffs_header + ".h>")
         headers.append(prefix + self.ctrl_coeffs_header + ".h>")
         headers.append(prefix + self.obsv_coeffs_header + ".h>")
         headers.append(prefix + self.loop_header + ".h>")
 
-        with open(self.system_name + "Coeffs.h", "w") as header_file:
+        with open(
+            self.class_name + "Coeffs." + self.header_extension, "w"
+        ) as header_file:
             print("#pragma once" + os.linesep, file=header_file)
             for header in sorted(headers):
                 print(header, file=header_file)
@@ -72,21 +85,19 @@ class SystemWriter:
                 header_file, self.loop_type, "Loop", in_header=True
             )
 
-    def write_cpp_source(self, header_path_prefix):
-        """Writes C++ source file.
+    def write_cpp_source(self):
+        """Writes C++ source file."""
+        if len(self.header_path_prefix) > 0 and self.header_path_prefix[-1] != os.sep:
+            self.header_path_prefix += os.sep
 
-        Keyword arguments:
-        header_path_prefix -- path prefix in which header exists
-        """
-        if len(header_path_prefix) > 0 and header_path_prefix[-1] != os.sep:
-            header_path_prefix += os.sep
-
-        with open(self.system_name + "Coeffs.cpp", "w") as source_file:
+        with open(self.class_name + "Coeffs.cpp", "w") as source_file:
             print(
                 '#include "'
-                + header_path_prefix
-                + self.system_name
-                + 'Coeffs.h"'
+                + self.header_path_prefix
+                + self.class_name
+                + "Coeffs."
+                + self.header_extension
+                + '"'
                 + os.linesep,
                 file=source_file,
             )
@@ -162,15 +173,15 @@ class SystemWriter:
             first_line_prefix = "  return " + self.loop_type + "("
             space_prefix = " " * len(first_line_prefix)
             print(
-                first_line_prefix + "Make" + self.system_name + "PlantCoeffs(),",
+                first_line_prefix + "Make" + self.class_name + "PlantCoeffs(),",
                 file=source_file,
             )
             print(
-                space_prefix + "Make" + self.system_name + "ControllerCoeffs(),",
+                space_prefix + "Make" + self.class_name + "ControllerCoeffs(),",
                 file=source_file,
             )
             print(
-                space_prefix + "Make" + self.system_name + "ObserverCoeffs());",
+                space_prefix + "Make" + self.class_name + "ObserverCoeffs());",
                 file=source_file,
             )
             print("}", file=source_file)
@@ -188,7 +199,7 @@ class SystemWriter:
             func_suffix = ";"
         else:
             func_suffix = " {"
-        func_name = "Make" + self.system_name + object_suffix + "()" + func_suffix
+        func_name = "Make" + self.class_name + object_suffix + "()" + func_suffix
         if len(return_type + " " + func_name) > 80:
             print(return_type, file=cpp_file)
             print(func_name, file=cpp_file)
