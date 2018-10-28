@@ -210,8 +210,8 @@ class System:
 
         # Run simulation
         for i in range(len(refs)):
-            self.r = refs[i]
-            self.update()
+            next_r = refs[i]
+            self.update(next_r)
 
             # Log states for plotting
             state_rec = np.concatenate((state_rec, self.x), axis=1)
