@@ -48,10 +48,21 @@ class System:
         # Observer matrices
         self.x_hat = np.zeros((self.sysc.A.shape[0], 1))
 
-    def update(self):
-        """Advance the model by one timestep."""
+    __default = object()
+
+    def update(self, next_r=__default):
+        """Advance the model by one timestep.
+
+        Keyword arguments:
+        next_r -- next controller reference (default: current reference)
+        """
         u = self.K * (self.r - self.x_hat)
-        uff = self.Kff * (self.r - self.sysd.A * self.r)
+        if next_r is not self.__default:
+            uff = self.Kff * (next_r - self.sysd.A * self.r)
+            self.r = next_r
+        else:
+            uff = self.Kff * (self.r - self.sysd.A * self.r)
+
         self.u = np.clip(u + uff, self.u_min, self.u_max)
         self.__update_observer()
         self.x = self.sysd.A * self.x + self.sysd.B * self.u
