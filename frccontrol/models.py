@@ -92,7 +92,7 @@ def elevator(motor, num_motors, m, r, G):
 
     # fmt: off
     A = np.matrix([[0, 1],
-                   [0, -G**2 * motor.Kt / (motor.R**2 * r * m * motor.Kv)]])
+                   [0, -G**2 * motor.Kt / (motor.R * r**2 * m * motor.Kv)]])
     B = np.matrix([[0],
                    [G * motor.Kt / (motor.R * r * m)]])
     C = np.matrix([[1, 0]])
