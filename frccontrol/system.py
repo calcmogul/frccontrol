@@ -180,6 +180,8 @@ class System:
         plt.subplot(2, 2, 3)
         frccnt.plot_observer_poles(self)
 
+        plt.tight_layout()
+
     def extract_row(self, buf, idx):
         """Extract row from 2D array.
 
