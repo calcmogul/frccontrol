@@ -113,7 +113,7 @@ def flywheel(motor, num_motors, J, G):
     motor -- instance of DcBrushedMotor
     num_motors -- number of motors driving the mechanism
     J -- flywheel moment of inertia in kg-m^2
-    G -- gear ratio from motor to carriage
+    G -- gear ratio from motor to flywheel
 
     Returns:
     StateSpace instance containing continuous model
