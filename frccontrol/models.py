@@ -91,12 +91,12 @@ def elevator(motor, num_motors, m, r, G):
     motor = gearbox(motor, num_motors)
 
     # fmt: off
-    A = np.matrix([[0, 1],
-                   [0, -G**2 * motor.Kt / (motor.R * r**2 * m * motor.Kv)]])
-    B = np.matrix([[0],
-                   [G * motor.Kt / (motor.R * r * m)]])
-    C = np.matrix([[1, 0]])
-    D = np.matrix([[0]])
+    A = np.array([[0, 1],
+                  [0, -G**2 * motor.Kt / (motor.R * r**2 * m * motor.Kv)]])
+    B = np.array([[0],
+                  [G * motor.Kt / (motor.R * r * m)]])
+    C = np.array([[1, 0]])
+    D = np.array([[0]])
     # fmt: on
 
     return cnt.ss(A, B, C, D)
@@ -120,10 +120,10 @@ def flywheel(motor, num_motors, J, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.matrix([[-G ** 2 * motor.Kt / (motor.Kv * motor.R * J)]])
-    B = np.matrix([[G * motor.Kt / (motor.R * J)]])
-    C = np.matrix([[1]])
-    D = np.matrix([[0]])
+    A = np.array([[-G ** 2 * motor.Kt / (motor.Kv * motor.R * J)]])
+    B = np.array([[G * motor.Kt / (motor.R * J)]])
+    C = np.array([[1]])
+    D = np.array([[0]])
 
     return cnt.ss(A, B, C, D)
 
@@ -156,18 +156,18 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
     C3 = -Gr ** 2 * motor.Kt / (motor.Kv * motor.R * r ** 2)
     C4 = Gr * motor.Kt / (motor.R * r)
     # fmt: off
-    A = np.matrix([[0, 1, 0, 0],
-                   [0, (1 / m + rb**2 / J) * C1, 0, (1 / m - rb**2 / J) * C3],
-                   [0, 0, 0, 1],
-                   [0, (1 / m - rb**2 / J) * C1, 0, (1 / m + rb**2 / J) * C3]])
-    B = np.matrix([[0, 0],
-                   [(1 / m + rb**2 / J) * C2, (1 / m - rb**2 / J) * C4],
-                   [0, 0],
-                   [(1 / m - rb**2 / J) * C2, (1 / m + rb**2 / J) * C4]])
-    C = np.matrix([[1, 0, 0, 0],
-                   [0, 0, 1, 0]])
-    D = np.matrix([[0, 0],
-                   [0, 0]])
+    A = np.array([[0, 1, 0, 0],
+                  [0, (1 / m + rb**2 / J) * C1, 0, (1 / m - rb**2 / J) * C3],
+                  [0, 0, 0, 1],
+                  [0, (1 / m - rb**2 / J) * C1, 0, (1 / m + rb**2 / J) * C3]])
+    B = np.array([[0, 0],
+                  [(1 / m + rb**2 / J) * C2, (1 / m - rb**2 / J) * C4],
+                  [0, 0],
+                  [(1 / m - rb**2 / J) * C2, (1 / m + rb**2 / J) * C4]])
+    C = np.array([[1, 0, 0, 0],
+                  [0, 0, 1, 0]])
+    D = np.array([[0, 0],
+                  [0, 0]])
     # fmt: on
 
     return cnt.ss(A, B, C, D)
@@ -191,9 +191,9 @@ def single_jointed_arm(motor, num_motors, J, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.matrix([[0, 1], [0, -G ** 2 * motor.Kt / (motor.Kv * motor.R * J)]])
-    B = np.matrix([[0], [G * motor.Kt / (motor.R * J)]])
-    C = np.matrix([[1, 0]])
-    D = np.matrix([[0]])
+    A = np.array([[0, 1], [0, -G ** 2 * motor.Kt / (motor.Kv * motor.R * J)]])
+    B = np.array([[0], [G * motor.Kt / (motor.R * J)]])
+    C = np.array([[1, 0]])
+    D = np.array([[0]])
 
     return cnt.ss(A, B, C, D)

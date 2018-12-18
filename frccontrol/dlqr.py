@@ -10,13 +10,13 @@ def dlqr(sys, Q, R):
     J = sum(0, inf, x.T * Q * x + u.T * R * u)
 
     Keyword arguments:
-    A -- numpy.matrix(states x states), The A matrix.
-    B -- numpy.matrix(inputs x states), The B matrix.
-    Q -- numpy.matrix(states x states), The state cost matrix.
-    R -- numpy.matrix(inputs x inputs), The control effort cost matrix.
+    A -- numpy.array(states x states), The A matrix.
+    B -- numpy.array(inputs x states), The B matrix.
+    Q -- numpy.array(states x states), The state cost matrix.
+    R -- numpy.array(inputs x inputs), The control effort cost matrix.
 
     Returns:
-    numpy.matrix(states x inputs), K
+    numpy.array(states x inputs), K
     """
     m = sys.A.shape[0]
 

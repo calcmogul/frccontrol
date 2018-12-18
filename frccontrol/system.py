@@ -56,28 +56,28 @@ class System:
         Keyword arguments:
         next_r -- next controller reference (default: current reference)
         """
-        u = self.K * (self.r - self.x_hat)
+        u = self.K @ (self.r - self.x_hat)
         if next_r is not self.__default:
-            uff = self.Kff * (next_r - self.sysd.A * self.r)
+            uff = self.Kff @ (next_r - self.sysd.A @ self.r)
             self.r = next_r
         else:
-            uff = self.Kff * (self.r - self.sysd.A * self.r)
+            uff = self.Kff @ (self.r - self.sysd.A @ self.r)
 
         self.u = np.clip(u + uff, self.u_min, self.u_max)
         self.__update_observer()
-        self.x = self.sysd.A * self.x + self.sysd.B * self.u
-        self.y = self.sysd.C * self.x + self.sysd.D * self.u
+        self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
+        self.y = self.sysd.C @ self.x + self.sysd.D @ self.u
 
     def predict_observer(self):
         """Runs the predict step of the observer update."""
-        self.x_hat = self.A * self.x_hat + self.B * self.u
+        self.x_hat = self.A @ self.x_hat + self.B @ self.u
 
     def correct_observer(self):
         """Runs the correct step of the observer update."""
         self.x_hat += (
             np.linalg.inv(self.sysd.A)
-            * self.L
-            * (self.y - self.sysd.C * self.x_hat - self.sysd.D * self.u)
+            @ self.L
+            @ (self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u)
         )
 
     def design_dlqr_controller(self, Q_elems, R_elems):
@@ -118,7 +118,7 @@ class System:
         self.Q = self.__make_cov_matrix(Q_elems)
         self.R = self.__make_cov_matrix(R_elems)
         kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
-        self.L = self.sysd.A * kalman_gain
+        self.L = self.sysd.A @ kalman_gain
 
     def place_observer_poles(self, poles):
         """Design a controller that places the closed-loop system poles at the
@@ -152,7 +152,7 @@ class System:
         Q = self.__make_cost_matrix(Q_elems)
         R = self.__make_cost_matrix(R_elems)
         self.Kff = (
-            np.linalg.inv(self.sysd.B.T * Q * self.sysd.B + R.T) * self.sysd.B.T * Q
+            np.linalg.inv(self.sysd.B.T @ Q @ self.sysd.B + R.T) @ self.sysd.B.T @ Q
         )
 
     def plot_pzmaps(self):
@@ -174,7 +174,7 @@ class System:
 
         # Plot observer poles
         sys = cnt.StateSpace(
-            self.sysd.A - self.L * self.sysd.C, self.sysd.B, self.sysd.C, self.sysd.D
+            self.sysd.A - self.L @ self.sysd.C, self.sysd.B, self.sysd.C, self.sysd.D
         )
         print("Observer poles =", sys.pole())
         plt.subplot(2, 2, 3)
@@ -261,9 +261,9 @@ class System:
     def __update_observer(self):
         """Updates the observer given the current value of u."""
         self.x_hat = (
-            self.sysd.A * self.x_hat
-            + self.sysd.B * self.u
-            + self.L * (self.y - self.sysd.C * self.x_hat - self.sysd.D * self.u)
+            self.sysd.A @ self.x_hat
+            + self.sysd.B @ self.u
+            + self.L @ (self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u)
         )
 
     def __make_cost_matrix(self, elems):
