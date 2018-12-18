@@ -76,11 +76,11 @@ def main():
     # Generate references for simulation
     for i in range(len(t)):
         if t[i] < l0:
-            r = np.matrix([[0.0], [0.0]])
+            r = np.array([[0.0], [0.0]])
         elif t[i] < l1:
-            r = np.matrix([[1.524], [0.0]])
+            r = np.array([[1.524], [0.0]])
         else:
-            r = np.matrix([[0.0], [0.0]])
+            r = np.array([[0.0], [0.0]])
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:

@@ -76,7 +76,7 @@ def main():
     # Generate references for simulation
     refs = []
     for i in range(len(t)):
-        r = np.matrix([[xprof[i]], [vprof[i]]])
+        r = np.array([[xprof[i]], [vprof[i]]])
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
