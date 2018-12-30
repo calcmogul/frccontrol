@@ -56,24 +56,35 @@ class System:
         Keyword arguments:
         next_r -- next controller reference (default: current reference)
         """
+        self.correct_observer()
+
+        # Update controller
         u = self.K @ (self.r - self.x_hat)
         if next_r is not self.__default:
             uff = self.Kff @ (next_r - self.sysd.A @ self.r)
             self.r = next_r
         else:
             uff = self.Kff @ (self.r - self.sysd.A @ self.r)
-
         self.u = np.clip(u + uff, self.u_min, self.u_max)
-        self.__update_observer()
+
+        self.predict_observer()
+
+        # Update simulation model
         self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
         self.y = self.sysd.C @ self.x + self.sysd.D @ self.u
 
     def predict_observer(self):
-        """Runs the predict step of the observer update."""
-        self.x_hat = self.A @ self.x_hat + self.B @ self.u
+        """Runs the predict step of the observer update.
+
+        In one update step, this should be run after correct_observer().
+        """
+        self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
 
     def correct_observer(self):
-        """Runs the correct step of the observer update."""
+        """Runs the correct step of the observer update.
+
+        In one update step, this should be run before predict_observer().
+        """
         self.x_hat += (
             np.linalg.inv(self.sysd.A)
             @ self.L
@@ -257,14 +268,6 @@ class System:
         """
         self.state_labels = [x[0] + " (" + x[1] + ")" for x in state_labels]
         self.u_labels = [x[0] + " (" + x[1] + ")" for x in u_labels]
-
-    def __update_observer(self):
-        """Updates the observer given the current value of u."""
-        self.x_hat = (
-            self.sysd.A @ self.x_hat
-            + self.sysd.B @ self.u
-            + self.L @ (self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u)
-        )
 
     def __make_cost_matrix(self, elems):
         """Creates a cost matrix from the given vector for use with LQR.
