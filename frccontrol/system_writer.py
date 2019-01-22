@@ -120,14 +120,11 @@ class SystemWriter:
                 )
             else:
                 self.__write_cpp_matrix(source_file, self.system.sysd.A, "A")
-                self.__write_cpp_matrix(
-                    source_file, np.linalg.inv(self.system.sysd.A), "Ainv"
-                )
                 self.__write_cpp_matrix(source_file, self.system.sysd.B, "B")
                 self.__write_cpp_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_cpp_matrix(source_file, self.system.sysd.D, "D")
                 print(
-                    "  return " + self.plant_coeffs_type + "(A, Ainv, B, C, D);",
+                    "  return " + self.plant_coeffs_type + "(A, B, C, D);",
                     file=source_file,
                 )
             print("}" + os.linesep, file=source_file)
@@ -162,8 +159,8 @@ class SystemWriter:
                 print(first_line_prefix + "Qcontinuous, Rcontinuous,", file=source_file)
                 print(space_prefix + "PsteadyState);", file=source_file)
             else:
-                self.__write_cpp_matrix(source_file, self.system.L, "L")
-                print("  return " + self.obsv_coeffs_type + "(L);", file=source_file)
+                self.__write_cpp_matrix(source_file, self.system.kalman_gain, "K")
+                print("  return " + self.obsv_coeffs_type + "(K);", file=source_file)
             print("}" + os.linesep, file=source_file)
 
             # Write MakeLoop()
