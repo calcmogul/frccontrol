@@ -32,7 +32,7 @@ class System:
         self.Kff = np.zeros((self.sysc.A.shape[0], self.sysc.A.shape[1]))
 
         # Observer matrices
-        self.L = np.zeros((self.sysc.A.shape[0], self.sysc.C.shape[0]))
+        self.kalman_gain = np.zeros((self.sysc.A.shape[0], self.sysc.C.shape[0]))
 
         self.reset()
 
@@ -85,10 +85,8 @@ class System:
 
         In one update step, this should be run before predict_observer().
         """
-        self.x_hat += (
-            np.linalg.inv(self.sysd.A)
-            @ self.L
-            @ (self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u)
+        self.x_hat += self.kalman_gain @ (
+            self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u
         )
 
     def design_dlqr_controller(self, Q_elems, R_elems):
@@ -128,8 +126,7 @@ class System:
         """
         self.Q = self.__make_cov_matrix(Q_elems)
         self.R = self.__make_cov_matrix(R_elems)
-        kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
-        self.L = self.sysd.A @ kalman_gain
+        self.kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
 
     def place_observer_poles(self, poles):
         """Design a controller that places the closed-loop system poles at the
@@ -142,7 +139,8 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        self.L = cnt.place(self.sysd.A.T, self.sysd.C.T, poles).T
+        L = cnt.place(self.sysd.A.T, self.sysd.C.T, poles).T
+        self.kalman_gain = np.linalg.inv(self.sysd.A) @ L
 
     def design_two_state_feedforward(self, Q_elems, R_elems):
         """Computes the feedforward constant for a two-state controller.
@@ -185,7 +183,10 @@ class System:
 
         # Plot observer poles
         sys = cnt.StateSpace(
-            self.sysd.A - self.L @ self.sysd.C, self.sysd.B, self.sysd.C, self.sysd.D
+            self.sysd.A - self.sysd.A @ self.kalman_gain @ self.sysd.C,
+            self.sysd.B,
+            self.sysd.C,
+            self.sysd.D,
         )
         print("Observer poles =", sys.pole())
         plt.subplot(2, 2, 3)

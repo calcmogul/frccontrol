@@ -61,7 +61,7 @@ def plot_observer_poles(system):
     system -- a System instance
     """
     sys_cl = cnt.StateSpace(
-        system.sysd.A - system.L * system.sysd.C,
+        system.sysd.A - system.sysd.A @ system.kalman_gain @ system.sysd.C,
         system.sysd.B,
         system.sysd.C,
         system.sysd.D,
