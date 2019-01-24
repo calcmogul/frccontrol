@@ -2,43 +2,38 @@
 designing controllers for them.
 """
 
+import abc
 import control as cnt
 import frccontrol as frccnt
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
 from . import kalmd
 from . import lqr
 from . import system_writer
 
 
 class System:
-    def __init__(self, sysc, u_min, u_max, dt):
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, states, u_min, u_max, dt, nonlinear=False):
         """Sets up the matrices for a state-space model.
 
         Keyword arguments:
-        sysc -- StateSpace instance containing continuous state-space model
+        states -- initial state vector around which to linearize model
         u_min -- vector of minimum control inputs for system
         u_max -- vector of maximum control inputs for system
         dt -- time between model/controller updates
+        nonlinear -- True if model is nonlinear (default: False)
         """
-        self.sysc = sysc
-        self.sysd = sysc.sample(dt)  # Discretize model
+        self.nonlinear = nonlinear
+        self.sysc = self.create_model(np.asarray(states))
+        self.dt = dt
+        self.sysd = self.sysc.sample(self.dt)  # Discretize model
 
-        self.u_min = np.asmatrix(u_min)
-        self.u_max = np.asmatrix(u_max)
-
-        # Controller matrices
-        self.K = np.zeros((self.sysc.B.shape[1], self.sysc.B.shape[0]))
-        self.Kff = np.zeros((self.sysc.A.shape[0], self.sysc.A.shape[1]))
-
-        # Observer matrices
-        self.kalman_gain = np.zeros((self.sysc.A.shape[0], self.sysc.C.shape[0]))
-
-        self.reset()
-
-    def reset(self):
         # Model matrices
         self.x = np.zeros((self.sysc.A.shape[0], 1))
+        self.x = np.asarray(states)
         self.u = np.zeros((self.sysc.B.shape[1], 1))
         self.y = np.zeros((self.sysc.C.shape[0], 1))
 
@@ -47,6 +42,20 @@ class System:
 
         # Observer matrices
         self.x_hat = np.zeros((self.sysc.A.shape[0], 1))
+        self.x_hat = np.asarray(states)
+
+        self.u_min = np.asarray(u_min)
+        self.u_max = np.asarray(u_max)
+
+        # Controller matrices
+        self.K = np.zeros((self.sysc.B.shape[1], self.sysc.B.shape[0]))
+        self.Kff = np.zeros((self.sysc.B.shape[1], self.sysc.B.shape[0]))
+
+        # Observer matrices
+        self.P = np.zeros(self.sysc.A.shape)
+        self.kalman_gain = np.zeros((self.sysc.A.shape[0], self.sysc.C.shape[0]))
+
+        self.design_controller_observer()
 
     __default = object()
 
@@ -56,6 +65,12 @@ class System:
         Keyword arguments:
         next_r -- next controller reference (default: current reference)
         """
+        self.update_plant()
+
+        if self.nonlinear:
+            self.sysc = self.create_model(self.x_hat)
+            self.sysd = self.sysc.sample(self.dt)  # Discretize model
+            self.design_controller_observer()
         self.correct_observer()
 
         # Update controller
@@ -69,7 +84,8 @@ class System:
 
         self.predict_observer()
 
-        # Update simulation model
+    def update_plant(self):
+        """Advance the model by one timestep."""
         self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
         self.y = self.sysd.C @ self.x + self.sysd.D @ self.u
 
@@ -80,14 +96,42 @@ class System:
         """
         self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
 
+        if self.nonlinear:
+            self.P = self.sysd.A @ self.P @ self.sysd.A.T + self.Q
+
     def correct_observer(self):
         """Runs the correct step of the observer update.
 
         In one update step, this should be run before predict_observer().
         """
+        if self.nonlinear:
+            self.kalman_gain = (
+                self.P
+                @ self.sysd.C.T
+                @ np.linalg.inv(self.sysd.C @ self.P @ self.sysd.C.T + self.R)
+            )
+            self.P = (
+                np.eye(self.sysd.A.shape[0]) - self.kalman_gain @ self.sysd.C
+            ) @ self.P
         self.x_hat += self.kalman_gain @ (
             self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u
         )
+
+    @abc.abstractmethod
+    def create_model(self, states=__default):
+        """Relinearize model around given state.
+
+        Keyword arguments:
+        states -- state vector around which to linearize model (if applicable)
+
+        Returns:
+        StateSpace instance containing continuous state-space model
+        """
+        return
+
+    @abc.abstractmethod
+    def design_controller_observer(self):
+        pass
 
     def design_lqr(self, Q_elems, R_elems):
         """Design a discrete time linear-quadratic regulator for the system.
@@ -126,7 +170,20 @@ class System:
         """
         self.Q = self.__make_cov_matrix(Q_elems)
         self.R = self.__make_cov_matrix(R_elems)
-        self.kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
+        if not self.nonlinear:
+            self.kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
+        else:
+            m = self.sysd.A.shape[0]
+            M = np.concatenate(
+                (
+                    np.concatenate((-self.sysd.A.T, self.Q), axis=1),
+                    np.concatenate((np.zeros(self.sysd.A.shape), self.sysd.A), axis=1),
+                ),
+                axis=0,
+            )
+            M = sp.linalg.expm(M * self.sysd.dt)
+            self.Q = M[m:, m:] @ M[:m, m:]
+            self.R = 1 / self.sysd.dt * self.R
 
     def place_observer_poles(self, poles):
         """Design a controller that places the closed-loop system poles at the

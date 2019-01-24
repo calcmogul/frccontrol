@@ -25,22 +25,27 @@ class SingleJointedArm(frccnt.System):
         u_labels = [("Voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
-        # Number of motors
-        self.num_motors = 1.0
-        # Mass of arm in kg
-        self.m = 2.2675
-        # Length of arm in m
-        self.l = 1.2192
-        # Arm moment of inertia in kg-m^2
-        self.J = 1 / 3 * self.m * self.l ** 2
-        # Gear ratio
-        self.G = 1.0 / 2.0
-
-        self.model = frccnt.models.single_jointed_arm(
-            frccnt.models.MOTOR_CIM, self.num_motors, self.J, self.G
+        frccnt.System.__init__(
+            self, np.zeros((2, 1)), np.array([[-12.0]]), np.array([[12.0]]), dt
         )
-        frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
 
+    def create_model(self, states):
+        # Number of motors
+        num_motors = 1.0
+        # Mass of arm in kg
+        m = 2.2675
+        # Length of arm in m
+        l = 1.2192
+        # Arm moment of inertia in kg-m^2
+        J = 1 / 3 * m * l ** 2
+        # Gear ratio
+        G = 1.0 / 2.0
+
+        return frccnt.models.single_jointed_arm(
+            frccnt.models.MOTOR_CIM, num_motors, J, G
+        )
+
+    def design_controller_observer(self):
         q_pos = 0.01745
         q_vel = 0.08726
         self.design_lqr([q_pos, q_vel], [12.0])
@@ -56,7 +61,7 @@ class SingleJointedArm(frccnt.System):
 def main():
     dt = 0.00505
     single_jointed_arm = SingleJointedArm(dt)
-    single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "Subsystems/")
+    single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:

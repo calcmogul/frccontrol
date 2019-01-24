@@ -29,46 +29,42 @@ class Drivetrain(frccnt.System):
         u_labels = [("Left voltage", "V"), ("Right voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
+        u_min = np.array([[-12.0], [-12.0]])
+        u_max = np.array([[12.0], [12.0]])
+        frccnt.System.__init__(self, np.zeros((4, 1)), u_min, u_max, dt)
+
+    def create_model(self, states):
         self.in_low_gear = False
 
         # Number of motors per side
-        self.num_motors = 2.0
+        num_motors = 2.0
 
         # High and low gear ratios of drivetrain
         Glow = 60.0 / 11.0
         Ghigh = 60.0 / 11.0
 
         # Drivetrain mass in kg
-        self.m = 52
+        m = 52
         # Radius of wheels in meters
-        self.r = 0.08255 / 2.0
+        r = 0.08255 / 2.0
         # Radius of robot in meters
-        self.rb = 0.59055 / 2.0
+        rb = 0.59055 / 2.0
         # Moment of inertia of the drivetrain in kg-m^2
-        self.J = 6.0
+        J = 6.0
 
         # Gear ratios of left and right sides of drivetrain respectively
         if self.in_low_gear:
-            self.Gl = Glow
-            self.Gr = Glow
+            Gl = Glow
+            Gr = Glow
         else:
-            self.Gl = Ghigh
-            self.Gr = Ghigh
+            Gl = Ghigh
+            Gr = Ghigh
 
-        self.model = frccnt.models.drivetrain(
-            frccnt.models.MOTOR_CIM,
-            self.num_motors,
-            self.m,
-            self.r,
-            self.rb,
-            self.J,
-            self.Gl,
-            self.Gr,
+        return frccnt.models.drivetrain(
+            frccnt.models.MOTOR_CIM, num_motors, m, r, rb, J, Gl, Gr
         )
-        u_min = np.array([[-12.0], [-12.0]])
-        u_max = np.array([[12.0], [12.0]])
-        frccnt.System.__init__(self, self.model, u_min, u_max, dt)
 
+    def design_controller_observer(self):
         if self.in_low_gear:
             q_pos = 0.12
             q_vel = 1.0
@@ -98,7 +94,7 @@ class Drivetrain(frccnt.System):
 def main():
     dt = 0.00505
     drivetrain = Drivetrain(dt)
-    drivetrain.export_cpp_coeffs("Drivetrain", "Subsystems/")
+    drivetrain.export_cpp_coeffs("Drivetrain", "subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:

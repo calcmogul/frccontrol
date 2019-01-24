@@ -25,18 +25,21 @@ class Flywheel(frccnt.System):
         u_labels = [("Voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
-        # Number of motors
-        self.num_motors = 1.0
-        # Flywheel moment of inertia in kg-m^2
-        self.J = 0.00032
-        # Gear ratio
-        self.G = 12.0 / 18.0
-
-        self.model = frccnt.models.flywheel(
-            frccnt.models.MOTOR_775PRO, self.num_motors, self.J, self.G
+        frccnt.System.__init__(
+            self, np.array([[0.0]]), np.array([[-12.0]]), np.array([[12.0]]), dt
         )
-        frccnt.System.__init__(self, self.model, -12.0, 12.0, dt)
 
+    def create_model(self, states):
+        # Number of motors
+        num_motors = 1.0
+        # Flywheel moment of inertia in kg-m^2
+        J = 0.00032
+        # Gear ratio
+        G = 12.0 / 18.0
+
+        return frccnt.models.flywheel(frccnt.models.MOTOR_775PRO, num_motors, J, G)
+
+    def design_controller_observer(self):
         q = [9.42]
         r = [12.0]
         self.design_lqr(q, r)
@@ -52,7 +55,7 @@ class Flywheel(frccnt.System):
 def main():
     dt = 0.00505
     flywheel = Flywheel(dt)
-    flywheel.export_cpp_coeffs("Flywheel", "Subsystems/")
+    flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(1)
