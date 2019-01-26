@@ -43,7 +43,7 @@ class SingleJointedArm(frccnt.System):
 
         q_pos = 0.01745
         q_vel = 0.08726
-        self.design_dlqr_controller([q_pos, q_vel], [12.0])
+        self.design_lqr([q_pos, q_vel], [12.0])
         self.design_two_state_feedforward([q_pos, q_vel], [12.0])
 
         q_pos = 0.01745

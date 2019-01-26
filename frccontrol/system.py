@@ -6,8 +6,8 @@ import control as cnt
 import frccontrol as frccnt
 import matplotlib.pyplot as plt
 import numpy as np
-from . import dlqr
 from . import kalmd
+from . import lqr
 from . import system_writer
 
 
@@ -89,8 +89,8 @@ class System:
             self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u
         )
 
-    def design_dlqr_controller(self, Q_elems, R_elems):
-        """Design a discrete-time LQR controller for the system.
+    def design_lqr(self, Q_elems, R_elems):
+        """Design a discrete time linear-quadratic regulator for the system.
 
         Keyword arguments:
         Q_elems -- a vector of the maximum allowed excursions of the states from
@@ -100,7 +100,7 @@ class System:
         """
         Q = self.__make_cost_matrix(Q_elems)
         R = self.__make_cost_matrix(R_elems)
-        self.K = dlqr(self.sysd, Q, R)
+        self.K = lqr(self.sysd, Q, R)
 
     def place_controller_poles(self, poles):
         """Design a controller that places the closed-loop system poles at the
@@ -116,7 +116,7 @@ class System:
         self.K = cnt.place(self.sysd.A, self.sysd.B, poles)
 
     def design_kalman_filter(self, Q_elems, R_elems):
-        """Design a discrete-time Kalman filter for the system.
+        """Design a discrete time Kalman filter for the system.
 
         Keyword arguments:
         Q_elems -- a vector of the standard deviations of each state from how

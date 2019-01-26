@@ -47,10 +47,10 @@ def closed_loop_ctrl(system):
     StateSpace instance representing closed-loop controller.
     """
     return cnt.StateSpace(
-        system.sysd.A - system.sysd.B * system.K,
-        system.sysd.B * system.K,
-        system.sysd.C - system.sysd.D * system.K,
-        system.sysd.D * system.K,
+        system.sysd.A - system.sysd.B @ system.K,
+        system.sysd.B @ system.K,
+        system.sysd.C - system.sysd.D @ system.K,
+        system.sysd.D @ system.K,
     )
 
 

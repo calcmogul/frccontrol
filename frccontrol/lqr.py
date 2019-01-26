@@ -3,11 +3,15 @@ import numpy as np
 import scipy as sp
 
 
-def dlqr(sys, Q, R):
-    """Solves for the optimal discrete-time LQR controller.
+def lqr(sys, Q, R):
+    """Solves for the optimal linear-quadratic regulator (LQR).
 
-    x(n+1) = A * x(n) + B * u(n)
-    J = sum(0, inf, x.T * Q * x + u.T * R * u)
+    For a continuous system:
+        xdot = A * x + B * u
+        J = int(0, inf, x.T * Q * x + u.T * R * u)
+    For a discrete system:
+        x(n+1) = A * x(n) + B * u(n)
+        J = sum(0, inf, x.T * Q * x + u.T * R * u)
 
     Keyword arguments:
     A -- numpy.array(states x states), The A matrix.
@@ -27,9 +31,9 @@ def dlqr(sys, Q, R):
             % (controllability_rank, m)
         )
 
-    # P = A.T * P * A - (A.T * P * B) * np.linalg.inv(R + B.T * P * B) *
-    #     (B.T * P.T * A) + Q
-    P = sp.linalg.solve_discrete_are(a=sys.A, b=sys.B, q=Q, r=R)
-
-    F = np.linalg.inv(R + sys.B.T * P * sys.B) * sys.B.T * P * sys.A
-    return F
+    if sys.dt == 0.0:
+        P = sp.linalg.solve_continuous_are(a=sys.A, b=sys.B, q=Q, r=R)
+        return np.linalg.inv(R) @ sys.B.T @ P
+    else:
+        P = sp.linalg.solve_discrete_are(a=sys.A, b=sys.B, q=Q, r=R)
+        return np.linalg.inv(R + sys.B.T @ P @ sys.B) @ sys.B.T @ P @ sys.A
