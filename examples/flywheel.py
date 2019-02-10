@@ -90,7 +90,7 @@ def main():
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure()
-        x_rec, ref_rec, u_rec = flywheel.generate_time_responses(t, refs)
+        x_rec, ref_rec, u_rec, y_rec = flywheel.generate_time_responses(t, refs)
         flywheel.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
         plt.savefig("flywheel_response.svg")

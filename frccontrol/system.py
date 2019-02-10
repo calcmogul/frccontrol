@@ -291,6 +291,7 @@ class System:
         x_rec -- recording of state estimates
         ref_rec -- recording of references
         u_rec -- recording of inputs
+        y_rec -- recording of outputs
 
         Keyword arguments:
         t -- list of timesteps corresponding to references
@@ -299,6 +300,7 @@ class System:
         x_rec = np.zeros((self.sysd.states, 0))
         ref_rec = np.zeros((self.sysd.states, 0))
         u_rec = np.zeros((self.sysd.inputs, 0))
+        y_rec = np.zeros((self.sysd.outputs, 0))
 
         # Run simulation
         self.r = refs[0]
@@ -310,8 +312,9 @@ class System:
             x_rec = np.concatenate((x_rec, self.x_hat), axis=1)
             ref_rec = np.concatenate((ref_rec, self.r), axis=1)
             u_rec = np.concatenate((u_rec, self.u), axis=1)
+            y_rec = np.concatenate((y_rec, self.y), axis=1)
 
-        return x_rec, ref_rec, u_rec
+        return x_rec, ref_rec, u_rec, y_rec
 
     def plot_time_responses(self, t, x_rec, ref_rec, u_rec):
         """Plots time-domain responses of the system and the control inputs.
