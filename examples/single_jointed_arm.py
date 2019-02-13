@@ -86,8 +86,8 @@ def main():
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(2)
-        state_rec, ref_rec, u_rec = single_jointed_arm.generate_time_responses(t, refs)
-        single_jointed_arm.plot_time_responses(t, state_rec, ref_rec, u_rec)
+        x_rec, ref_rec, u_rec = single_jointed_arm.generate_time_responses(t, refs)
+        single_jointed_arm.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
         plt.savefig("single_jointed_arm_response.svg")
     if "--noninteractive" not in sys.argv:

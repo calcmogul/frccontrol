@@ -88,8 +88,8 @@ def main():
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(2)
-        state_rec, ref_rec, u_rec = elevator.generate_time_responses(t, refs)
-        elevator.plot_time_responses(t, state_rec, ref_rec, u_rec)
+        x_rec, ref_rec, u_rec = elevator.generate_time_responses(t, refs)
+        elevator.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
         plt.savefig("elevator_response.svg")
     if "--noninteractive" not in sys.argv:

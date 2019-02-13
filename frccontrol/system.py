@@ -73,14 +73,7 @@ class System:
             self.design_controller_observer()
         self.correct_observer()
 
-        # Update controller
-        u = self.K @ (self.r - self.x_hat)
-        if next_r is not self.__default:
-            uff = self.Kff @ (next_r - self.sysd.A @ self.r)
-            self.r = next_r
-        else:
-            uff = self.Kff @ (self.r - self.sysd.A @ self.r)
-        self.u = np.clip(u + uff, self.u_min, self.u_max)
+        self.update_controller(next_r)
 
         self.predict_observer()
 
@@ -116,6 +109,20 @@ class System:
         self.x_hat += self.kalman_gain @ (
             self.y - self.sysd.C @ self.x_hat - self.sysd.D @ self.u
         )
+
+    def update_controller(self, next_r=__default):
+        """Advance the controller by one timestep.
+
+        Keyword arguments:
+        next_r -- next controller reference (default: current reference)
+        """
+        u = self.K @ (self.r - self.x_hat)
+        if next_r is not self.__default:
+            uff = self.Kff @ (next_r - self.sysd.A @ self.r)
+            self.r = next_r
+        else:
+            uff = self.Kff @ (self.r - self.sysd.A @ self.r)
+        self.u = np.clip(u + uff, self.u_min, self.u_max)
 
     @abc.abstractmethod
     def create_model(self, states=__default):
@@ -267,15 +274,15 @@ class System:
         """Generate time-domain responses of the system and the control inputs.
 
         Returns:
-        state_rec -- recording of states from generate_time_responses()
-        ref_rec -- recording of references from generate_time_responses()
-        u_rec -- recording of inputs from generate_time_responses()
+        x_rec -- recording of state estimates
+        ref_rec -- recording of references
+        u_rec -- recording of inputs
 
         Keyword arguments:
         time -- list of timesteps corresponding to references
         refs -- list of reference vectors, one for each time
         """
-        state_rec = np.zeros((self.sysd.states, 0))
+        x_rec = np.zeros((self.sysd.states, 0))
         ref_rec = np.zeros((self.sysd.states, 0))
         u_rec = np.zeros((self.sysd.inputs, 0))
 
@@ -285,18 +292,18 @@ class System:
             self.update(next_r)
 
             # Log states for plotting
-            state_rec = np.concatenate((state_rec, self.x), axis=1)
+            x_rec = np.concatenate((x_rec, self.x_hat), axis=1)
             ref_rec = np.concatenate((ref_rec, self.r), axis=1)
             u_rec = np.concatenate((u_rec, self.u), axis=1)
 
-        return state_rec, ref_rec, u_rec
+        return x_rec, ref_rec, u_rec
 
-    def plot_time_responses(self, t, state_rec, ref_rec, u_rec):
+    def plot_time_responses(self, t, x_rec, ref_rec, u_rec):
         """Plots time-domain responses of the system and the control inputs.
 
         Keyword arguments:
         time -- list of timesteps corresponding to references.
-        state_rec -- recording of states from generate_time_responses()
+        x_rec -- recording of state estimates from generate_time_responses()
         ref_rec -- recording of references from generate_time_responses()
         u_rec -- recording of inputs from generate_time_responses()
         """
@@ -306,7 +313,7 @@ class System:
             plt.ylabel(self.state_labels[i])
             if i == 0:
                 plt.title("Time-domain responses")
-            plt.plot(t, self.extract_row(state_rec, i), label="Estimated state")
+            plt.plot(t, self.extract_row(x_rec, i), label="Estimated state")
             plt.plot(t, self.extract_row(ref_rec, i), label="Reference")
             plt.legend()
 
