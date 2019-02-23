@@ -369,6 +369,14 @@ class System:
         """
         return np.diag(np.square(elems))
 
+    def export_kotlin_coeffs(self,
+                             class_name,
+                             period_variant=False):
+        """Exports matrices to a Kotlin source file"""
+
+        system_writer = frccnt.system_writer.SystemWriter(self, class_name, "", "", period_variant)
+        system_writer.write_kotlin_source()
+
     def export_cpp_coeffs(
         self,
         class_name,

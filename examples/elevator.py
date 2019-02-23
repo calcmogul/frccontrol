@@ -56,6 +56,7 @@ def main():
     dt = 0.00505
     elevator = Elevator(dt)
     elevator.export_cpp_coeffs("Elevator", "subsystems/")
+    elevator.export_kotlin_coeffs("Elevator")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:

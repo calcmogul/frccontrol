@@ -7,12 +7,12 @@ import os
 
 class SystemWriter:
     def __init__(
-        self,
-        system,
-        class_name,
-        header_path_prefix,
-        header_extension,
-        period_variant=False,
+            self,
+            system,
+            class_name,
+            header_path_prefix,
+            header_extension,
+            period_variant=False,
     ):
         """Exports matrices to pair of C++ source files.
 
@@ -29,13 +29,13 @@ class SystemWriter:
         self.header_path_prefix = header_path_prefix
         self.header_extension = header_extension
         template = (
-            "<"
-            + str(system.sysd.A.shape[0])
-            + ", "
-            + str(system.sysd.B.shape[1])
-            + ", "
-            + str(system.sysd.C.shape[0])
-            + ">"
+                "<"
+                + str(system.sysd.A.shape[0])
+                + ", "
+                + str(system.sysd.B.shape[1])
+                + ", "
+                + str(system.sysd.C.shape[0])
+                + ">"
         )
 
         self.period_variant = period_variant
@@ -66,7 +66,7 @@ class SystemWriter:
         headers.append(prefix + self.loop_header + ".h>")
 
         with open(
-            self.class_name + "Coeffs." + self.header_extension, "w"
+                self.class_name + "Coeffs." + self.header_extension, "w"
         ) as header_file:
             print("#pragma once" + os.linesep, file=header_file)
             for header in sorted(headers):
@@ -84,6 +84,79 @@ class SystemWriter:
             self.__write_cpp_func_name(
                 header_file, self.loop_type, "Loop", in_header=True
             )
+
+    def write_kotlin_source(self):
+        """Writes Kotlin source file."""
+        prefix = "import "
+        imports = [prefix + "koma.matrix.Matrix", prefix + "koma.extensions.set"]
+
+        with open(self.class_name + "Coeffs.kt", "w") as source_file:
+            for val in sorted(imports):
+                print(val, file=source_file)
+
+            source_file.write(os.linesep)
+            ty = "Matrix<Double>"
+
+            # data classes needed because java state space isn't in wpilib (yet)
+            self.__write_kotlin_data_class(source_file, "StateSpacePlantCoeffs", {"A": ty, "B": ty, "C": ty, "D": ty})
+            self.__write_kotlin_data_class(source_file, "StateSpaceControllerCoeffs",
+                                           {"K": ty, "Kff": ty, "Umin": ty, "Umax": ty})
+            if self.period_variant:
+                self.__write_kotlin_data_class(source_file, "StateSpaceObserverCoeffs", {"Qcontinuous": ty, "Rcontinuous": ty, "PsteadyState": ty})
+            else:
+                self.__write_kotlin_data_class(source_file, "StateSpaceObserverCoeffs", {"K": ty})
+            source_file.write(os.linesep)
+
+            # write makePlantCoeffs()
+            self.__write_kotlin_func_name(source_file, "StateSpacePlantCoeffs", "PlantCoeffs")
+            if self.period_variant:
+                self.__write_kotlin_matrix(source_file, self.system.sysc.A, "Acontinuous")
+                self.__write_kotlin_matrix(source_file, self.system.sysc.B, "Bcontinuous")
+                self.__write_kotlin_matrix(source_file, self.system.sysd.C, "C")
+                self.__write_kotlin_matrix(source_file, self.system.sysd.D, "D")
+                print(
+                    "  return StateSpacePlantCoeffs(Acontinuous, Bcontinuous, C, D)",
+                    file=source_file)
+            else:
+                self.__write_kotlin_matrix(source_file, self.system.sysd.A, "A")
+                self.__write_kotlin_matrix(source_file, self.system.sysd.B, "B")
+                self.__write_kotlin_matrix(source_file, self.system.sysd.C, "C")
+                self.__write_kotlin_matrix(source_file, self.system.sysd.D, "D")
+                print(
+                    "  return StateSpacePlantCoeffs(A, B, C, D)",
+                    file=source_file
+                )
+            print("}" + os.linesep, file=source_file)
+
+            # Write makeControllerCoeffs()
+            self.__write_kotlin_func_name(source_file, "StateSpaceControllerCoeffs", "ControllerCoeffs")
+            self.__write_kotlin_matrix(source_file, self.system.K, "K")
+            self.__write_kotlin_matrix(source_file, self.system.Kff, "Kff")
+            self.__write_kotlin_matrix(source_file, self.system.u_min, "Umin")
+            self.__write_kotlin_matrix(source_file, self.system.u_max, "Umax")
+            print(
+                "  return StateSpaceControllerCoeffs(K, Kff, Umin, Umax)",
+                file=source_file
+            )
+            print("}" + os.linesep, file=source_file)
+
+            # Write makeObserverCoeffs()
+            self.__write_kotlin_func_name(source_file, "StateSpaceObserverCoeffs", "ObserverCoeffs")
+            if self.period_variant:
+                self.__write_kotlin_matrix(source_file, self.system.Q, "Qcontinuous")
+                self.__write_kotlin_matrix(source_file, self.system.R, "Rcontinuous")
+                self.__write_kotlin_matrix(source_file, self.system.P_steady, "PsteadyState")
+
+                first_line_prefix = "  return StateSpaceObserverCoeffs("
+                space_prefix = " " * len(first_line_prefix)
+                print(first_line_prefix + "Qcontinuous, Rcontinuous,", file=source_file)
+                print(space_prefix + "PsteadyState)", file=source_file)
+            else:
+                self.__write_kotlin_matrix(source_file, self.system.kalman_gain, "K")
+                print("  return StateSpaceObserverCoeffs(K)", file=source_file)
+            print("}" + os.linesep, file=source_file)
+
+
 
     def write_cpp_source(self):
         """Writes C++ source file."""
@@ -203,6 +276,10 @@ class SystemWriter:
         else:
             print(return_type + " " + func_name, file=cpp_file)
 
+    def __write_kotlin_func_name(self, kt_file, return_type, object_suffix):
+        func_name = "make" + self.class_name + object_suffix + "(): " + return_type + " {"
+        print("fun " + func_name, file=kt_file)
+
     def __write_cpp_matrix(self, cpp_file, matrix, matrix_name):
         print(
             "  Eigen::Matrix<double, "
@@ -227,4 +304,32 @@ class SystemWriter:
                     + str(matrix[row, col])
                     + ";",
                     file=cpp_file,
+                )
+
+    def __write_kotlin_data_class(self, kt_file, name, members):
+        stmts = [n + ": " + t for n, t in members.items()]
+        print("data class " + name + "(", file=kt_file)
+        for i in range(len(stmts)):
+            stmt = stmts[i]
+            if i != len(stmts) - 1:
+                print("  " + stmt + ",", file=kt_file)
+            else:
+                print("  " + stmt, file=kt_file)
+        print(")", file=kt_file)
+
+    def __write_kotlin_matrix(self, kt_file, matrix, matrix_name):
+        print("  val " + matrix_name + " = Matrix<Double>(" + str(matrix.shape[0]) + ", " + str(
+            matrix.shape[1]) + ") { _, _ -> 0.0 }", file=kt_file)
+        for row in range(matrix.shape[0]):
+            for col in range(matrix.shape[1]):
+                print(
+                    "  "
+                    + matrix_name
+                    + "["
+                    + str(row)
+                    + ", "
+                    + str(col)
+                    + "] = "
+                    + str(matrix[row, col]),
+                    file=kt_file
                 )
