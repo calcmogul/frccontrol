@@ -206,12 +206,14 @@ class System:
         L = cnt.place(self.sysd.A.T, self.sysd.C.T, poles).T
         self.kalman_gain = np.linalg.inv(self.sysd.A) @ L
 
-    def design_two_state_feedforward(self, Q_elems, R_elems):
+    def design_two_state_feedforward(self, Q_elems=None, R_elems=None):
         """Computes the feedforward constant for a two-state controller.
 
         This will take the form u = K_ff * (r_{n+1} - A r_n), where K_ff is the
         feed-forwards constant. It is important that Kff is *only* computed off
         the goal and not the feedback terms.
+
+        If either Q_elems or R_elems is not specified, then both are ignored.
 
         Keyword arguments:
         Q_elems -- a vector of the maximum allowed excursions in the state
@@ -219,14 +221,19 @@ class System:
         R_elems -- a vector of the maximum allowed excursions of the control
                    inputs from no actuation.
         """
-        # We want to find the optimal U such that we minimize the tracking cost.
-        # This means that we want to minimize
-        #   (B u - (r_{n+1} - A r_n))^T Q (B u - (r_{n+1} - A r_n)) + u^T R u
-        Q = self.__make_cost_matrix(Q_elems)
-        R = self.__make_cost_matrix(R_elems)
-        self.Kff = (
-            np.linalg.inv(self.sysd.B.T @ Q @ self.sysd.B + R.T) @ self.sysd.B.T @ Q
-        )
+        if Q_elems is not None and R_elems is not None:
+            # We want to find the optimal U such that we minimize the tracking
+            # cost. This means that we want to minimize
+            #   (B u - (r_{n+1} - A r_n))^T Q (B u - (r_{n+1} - A r_n)) + u^T R u
+            Q = self.__make_cost_matrix(Q_elems)
+            R = self.__make_cost_matrix(R_elems)
+            self.Kff = (
+                np.linalg.inv(self.sysd.B.T @ Q @ self.sysd.B + R.T) @ self.sysd.B.T @ Q
+            )
+        else:
+            # Without Q and R weighting matrices, K_ff = B^+ where B^+ is the
+            # Moore-Penrose pseudoinverse of B.
+            self.Kff = np.linalg.pinv(self.sysd.B)
 
     def plot_pzmaps(self):
         """Plots pole-zero maps of open-loop system, closed-loop system, and
