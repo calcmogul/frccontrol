@@ -8,15 +8,12 @@ import frccontrol as frccnt
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
-from . import kalmd
-from . import lqr
-from . import system_writer
 
 
 class System:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, states, u_min, u_max, dt, nonlinear=False):
+    def __init__(self, states, u_min, u_max, dt, nonlinear_func=None):
         """Sets up the matrices for a state-space model.
 
         Keyword arguments:
@@ -24,9 +21,10 @@ class System:
         u_min -- vector of minimum control inputs for system
         u_max -- vector of maximum control inputs for system
         dt -- time between model/controller updates
-        nonlinear -- True if model is nonlinear (default: False)
+        nonlinear_func -- function that takes x and u and returns the state
+                          derivative for nonlinear systems (optional)
         """
-        self.nonlinear = nonlinear
+        self.nonlinear_func = nonlinear_func
         self.sysc = self.create_model(np.asarray(states))
         self.dt = dt
         self.sysd = self.sysc.sample(self.dt)  # Discretize model
@@ -65,21 +63,23 @@ class System:
         Keyword arguments:
         next_r -- next controller reference (default: current reference)
         """
-        self.update_plant()
-
-        if self.nonlinear:
+        if self.nonlinear_func:
             self.sysc = self.create_model(self.x_hat)
             self.sysd = self.sysc.sample(self.dt)  # Discretize model
             self.design_controller_observer()
+        self.update_plant()
         self.correct_observer()
-
         self.update_controller(next_r)
-
         self.predict_observer()
 
     def update_plant(self):
         """Advance the model by one timestep."""
-        self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
+        if self.nonlinear_func:
+            from . import runge_kutta
+
+            self.x = runge_kutta(self.nonlinear_func, self.x, self.u, self.dt)
+        else:
+            self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
         self.y = self.sysd.C @ self.x + self.sysd.D @ self.u
 
     def predict_observer(self):
@@ -87,17 +87,20 @@ class System:
 
         In one update step, this should be run after correct_observer().
         """
-        self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
+        if self.nonlinear_func:
+            from . import runge_kutta
 
-        if self.nonlinear:
+            self.x_hat = runge_kutta(self.nonlinear_func, self.x, self.u, self.dt)
             self.P = self.sysd.A @ self.P @ self.sysd.A.T + self.Q
+        else:
+            self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
 
     def correct_observer(self):
         """Runs the correct step of the observer update.
 
         In one update step, this should be run before predict_observer().
         """
-        if self.nonlinear:
+        if self.nonlinear_func:
             self.kalman_gain = (
                 self.P
                 @ self.sysd.C.T
@@ -149,6 +152,8 @@ class System:
         R_elems -- a vector of the maximum allowed excursions of the control
                    inputs from no actuation.
         """
+        from . import lqr
+
         Q = self.__make_cost_matrix(Q_elems)
         R = self.__make_cost_matrix(R_elems)
         self.K = lqr(self.sysd, Q, R)
@@ -177,7 +182,9 @@ class System:
         """
         self.Q = self.__make_cov_matrix(Q_elems)
         self.R = self.__make_cov_matrix(R_elems)
-        if not self.nonlinear:
+        if not self.nonlinear_func:
+            from . import kalmd
+
             self.kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
         else:
             m = self.sysd.A.shape[0]
@@ -294,6 +301,7 @@ class System:
         u_rec = np.zeros((self.sysd.inputs, 0))
 
         # Run simulation
+        self.r = refs[0]
         for i in range(len(refs)):
             next_r = refs[i]
             self.update(next_r)
@@ -392,7 +400,9 @@ class System:
         period_variant -- True to use PeriodVariantLoop, False to use
                           StateSpaceLoop
         """
-        system_writer = frccnt.system_writer.SystemWriter(
+        from . import system_writer
+
+        system_writer = system_writer.SystemWriter(
             self, class_name, header_path_prefix, header_extension, period_variant
         )
         system_writer.write_cpp_header()
