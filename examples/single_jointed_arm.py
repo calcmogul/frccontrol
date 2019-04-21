@@ -26,10 +26,15 @@ class SingleJointedArm(fct.System):
         self.set_plot_labels(state_labels, u_labels)
 
         fct.System.__init__(
-            self, np.zeros((2, 1)), np.array([[-12.0]]), np.array([[12.0]]), dt
+            self,
+            np.array([[-12.0]]),
+            np.array([[12.0]]),
+            dt,
+            np.zeros((2, 1)),
+            np.zeros((1, 1)),
         )
 
-    def create_model(self, states):
+    def create_model(self, states, inputs):
         # Number of motors
         num_motors = 1.0
         # Mass of arm in kg

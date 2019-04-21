@@ -13,26 +13,27 @@ import scipy as sp
 class System:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, states, u_min, u_max, dt, nonlinear_func=None):
+    def __init__(self, u_min, u_max, dt, states, inputs, nonlinear_func=None):
         """Sets up the matrices for a state-space model.
 
         Keyword arguments:
-        states -- initial state vector around which to linearize model
         u_min -- vector of minimum control inputs for system
         u_max -- vector of maximum control inputs for system
         dt -- time between model/controller updates
+        states -- initial state vector around which to linearize model
+        inputs -- initial input vector around which to linearize model
         nonlinear_func -- function that takes x and u and returns the state
                           derivative for a nonlinear system (optional)
         """
         self.f = nonlinear_func
-        self.sysc = self.create_model(np.asarray(states))
+        self.sysc = self.create_model(np.asarray(states), np.asarray(inputs))
         self.dt = dt
         self.sysd = self.sysc.sample(self.dt)  # Discretize model
 
         # Model matrices
         self.x = np.zeros((self.sysc.A.shape[0], 1))
         self.x = np.asarray(states)
-        self.u = np.zeros((self.sysc.B.shape[1], 1))
+        self.u = np.asarray(inputs)
         self.y = np.zeros((self.sysc.C.shape[0], 1))
 
         # Controller matrices
@@ -131,11 +132,12 @@ class System:
         self.u = np.clip(u + uff, self.u_min, self.u_max)
 
     @abc.abstractmethod
-    def create_model(self, states=__default):
+    def create_model(self, states=__default, inputs=__default):
         """Relinearize model around given state.
 
         Keyword arguments:
         states -- state vector around which to linearize model (if applicable)
+        inputs -- input vector around which to linearize model (if applicable)
 
         Returns:
         StateSpace instance containing continuous state-space model
