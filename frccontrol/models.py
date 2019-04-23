@@ -128,8 +128,8 @@ def flywheel(motor, num_motors, J, G):
     return cnt.ss(A, B, C, D)
 
 
-def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
-    """Returns the state-space model for a drivetrain.
+def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
+    """Returns the state-space model for a differential drive.
 
     States: [[left position], [left velocity],
              [right position], [right velocity]]
@@ -142,9 +142,9 @@ def drivetrain(motor, num_motors, m, r, rb, J, Gl, Gr):
     m -- mass of robot in kg
     r -- radius of wheels in meters
     rb -- radius of robot in meters
-    J -- moment of inertia of the drivetrain in kg-m^2
-    Gl -- gear ratio of left side of drivetrain
-    Gr -- gear ratio of right side of drivetrain
+    J -- moment of inertia of the differential drive in kg-m^2
+    Gl -- gear ratio of left side of the differential drive
+    Gr -- gear ratio of right side of the differential drive
 
     Returns:
     StateSpace instance containing continuous model

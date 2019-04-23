@@ -308,7 +308,7 @@ class System:
         u_rec -- recording of inputs
 
         Keyword arguments:
-        time -- list of timesteps corresponding to references
+        t -- list of timesteps corresponding to references
         refs -- list of reference vectors, one for each time
         """
         x_rec = np.zeros((self.sysd.states, 0))
