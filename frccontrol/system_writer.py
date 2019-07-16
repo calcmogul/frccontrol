@@ -205,6 +205,7 @@ class SystemWriter:
         imports.append(prefix + "controller." + self.plant_coeffs_header + ";")
         imports.append(prefix + "controller." + self.ctrl_coeffs_header + ";")
         imports.append(prefix + "controller." + self.obsv_coeffs_header + ";")
+        imports.append(prefix + "controller." + self.loop_header + ";")
 
         # Number types and matrices
         imports.append(prefix + "math.numbers.*;")
@@ -220,6 +221,9 @@ class SystemWriter:
 
             print("public class " + self.class_name + "Coeffs {", file=source_file)
 
+            states = "Nat.N" + str(self.system.sysd.A.shape[0]) + "()"
+            inputs = "Nat.N" + str(self.system.sysd.B.shape[1]) + "()"
+            outputs = "Nat.N" + str(self.system.sysd.C.shape[0]) + "()"
             # MakePlantCoeffs()
             self.__write_java_func_name(source_file, self.plant_coeffs_type_java, "PlantCoeffs")
             if self.period_variant:
@@ -230,14 +234,17 @@ class SystemWriter:
 
                 print("    return " +
                       self.plant_coeffs_type_java +
-                      "(Acontinuous, Bcontinuous, C, D);", file=source_file)
+                      "(" + states + ", " + inputs + ", " + outputs + ", Acontinuous, Bcontinuous, C, D);",
+                      file=source_file)
             else:
                 self.__write_java_matrix(source_file, self.system.sysd.A, "A")
                 self.__write_java_matrix(source_file, self.system.sysd.B, "B")
                 self.__write_java_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_java_matrix(source_file, self.system.sysd.D, "D")
 
-                print("    return new " + self.plant_coeffs_type_java + "(A, B, C, D);", file=source_file)
+                print(
+                    "    return new " + self.plant_coeffs_type_java + "(" + states + ", " + inputs + ", " + outputs + ", A, B, C, D);",
+                    file=source_file)
             print("  }" + os.linesep, file=source_file)
 
             # MakeControllerCoeffs()
@@ -276,15 +283,15 @@ class SystemWriter:
             first_line_prefix = "    return new " + self.loop_type_java + "("
             space_prefix = " " * len(first_line_prefix)
             print(
-                first_line_prefix + "Make" + self.class_name + "PlantCoeffs(),",
+                first_line_prefix + "make" + self.class_name + "PlantCoeffs(),",
                 file=source_file,
             )
             print(
-                space_prefix + "Make" + self.class_name + "ControllerCoeffs(),",
+                space_prefix + "make" + self.class_name + "ControllerCoeffs(),",
                 file=source_file,
             )
             print(
-                space_prefix + "Make" + self.class_name + "ObserverCoeffs());",
+                space_prefix + "make" + self.class_name + "ObserverCoeffs());",
                 file=source_file,
             )
 
