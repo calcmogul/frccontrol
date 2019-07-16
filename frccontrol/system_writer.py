@@ -42,7 +42,7 @@ class SystemWriter:
         if period_variant:
             self.class_type = "PeriodVariant"
             self.plant_coeffs_header = "PeriodVariantPlantCoeffs"
-            self.obsv_coeffs_header = "PeriodVariantKalmanFilterCoeffs"
+            self.obsv_coeffs_header = "PeriodVariantObserverCoeffs"
             self.loop_header = "PeriodVariantLoop"
         else:
             self.class_type = "StateSpace"

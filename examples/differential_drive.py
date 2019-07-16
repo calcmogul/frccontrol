@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class Drivetrain(frccnt.System):
+class DifferentialDrive(frccnt.System):
     def __init__(self, dt):
-        """Drivetrain subsystem.
+        """DifferentialDrive subsystem.
 
         Keyword arguments:
         dt -- time between model/controller updates
@@ -39,7 +39,7 @@ class Drivetrain(frccnt.System):
         # Number of motors per side
         num_motors = 2.0
 
-        # High and low gear ratios of drivetrain
+        # High and low gear ratios of differential drive
         Glow = 60.0 / 11.0
         Ghigh = 60.0 / 11.0
 
@@ -49,10 +49,10 @@ class Drivetrain(frccnt.System):
         r = 0.08255 / 2.0
         # Radius of robot in meters
         rb = 0.59055 / 2.0
-        # Moment of inertia of the drivetrain in kg-m^2
+        # Moment of inertia of the differential drive in kg-m^2
         J = 6.0
 
-        # Gear ratios of left and right sides of drivetrain respectively
+        # Gear ratios of left and right sides of differential drive respectively
         if self.in_low_gear:
             Gl = Glow
             Gr = Glow
@@ -60,7 +60,7 @@ class Drivetrain(frccnt.System):
             Gl = Ghigh
             Gr = Ghigh
 
-        return frccnt.models.drivetrain(
+        return frccnt.models.differential_drive(
             frccnt.models.MOTOR_CIM, num_motors, m, r, rb, J, Gl, Gr
         )
 
@@ -93,19 +93,19 @@ class Drivetrain(frccnt.System):
 
 def main():
     dt = 0.00505
-    drivetrain = Drivetrain(dt)
-    drivetrain.export_cpp_coeffs("Drivetrain", "subsystems/")
+    diff_drive = DifferentialDrive(dt)
+    diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:
             import slycot
 
             plt.figure(1)
-            drivetrain.plot_pzmaps()
+            diff_drive.plot_pzmaps()
         except ImportError:  # Slycot unavailable. Can't show pzmaps.
             pass
     if "--save-plots" in sys.argv:
-        plt.savefig("drivetrain_pzmaps.svg")
+        plt.savefig("differential_drive_pzmaps.svg")
 
     t, xprof, vprof, aprof = frccnt.generate_s_curve_profile(
         max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
@@ -119,10 +119,10 @@ def main():
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(2)
-        x_rec, ref_rec, u_rec = drivetrain.generate_time_responses(t, refs)
-        drivetrain.plot_time_responses(t, x_rec, ref_rec, u_rec)
+        x_rec, ref_rec, u_rec = diff_drive.generate_time_responses(t, refs)
+        diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
-        plt.savefig("drivetrain_response.svg")
+        plt.savefig("differential_drive_response.svg")
     if "--noninteractive" not in sys.argv:
         plt.show()
 

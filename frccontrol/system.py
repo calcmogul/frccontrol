@@ -8,15 +8,12 @@ import frccontrol as frccnt
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
-from . import kalmd
-from . import lqr
-from . import system_writer
 
 
 class System:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, states, u_min, u_max, dt, nonlinear=False):
+    def __init__(self, states, u_min, u_max, dt, nonlinear_func=None):
         """Sets up the matrices for a state-space model.
 
         Keyword arguments:
@@ -24,9 +21,10 @@ class System:
         u_min -- vector of minimum control inputs for system
         u_max -- vector of maximum control inputs for system
         dt -- time between model/controller updates
-        nonlinear -- True if model is nonlinear (default: False)
+        nonlinear_func -- function that takes x and u and returns the state
+                          derivative for a nonlinear system (optional)
         """
-        self.nonlinear = nonlinear
+        self.f = nonlinear_func
         self.sysc = self.create_model(np.asarray(states))
         self.dt = dt
         self.sysd = self.sysc.sample(self.dt)  # Discretize model
@@ -66,20 +64,18 @@ class System:
         next_r -- next controller reference (default: current reference)
         """
         self.update_plant()
-
-        if self.nonlinear:
-            self.sysc = self.create_model(self.x_hat)
-            self.sysd = self.sysc.sample(self.dt)  # Discretize model
-            self.design_controller_observer()
         self.correct_observer()
-
         self.update_controller(next_r)
-
         self.predict_observer()
 
     def update_plant(self):
         """Advance the model by one timestep."""
-        self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
+        if self.f:
+            from . import runge_kutta
+
+            self.x = runge_kutta(self.f, self.x, self.u, self.dt)
+        else:
+            self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
         self.y = self.sysd.C @ self.x + self.sysd.D @ self.u
 
     def predict_observer(self):
@@ -87,17 +83,20 @@ class System:
 
         In one update step, this should be run after correct_observer().
         """
-        self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
+        if self.f:
+            from . import runge_kutta
 
-        if self.nonlinear:
+            self.x_hat = runge_kutta(self.f, self.x, self.u, self.dt)
             self.P = self.sysd.A @ self.P @ self.sysd.A.T + self.Q
+        else:
+            self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
 
     def correct_observer(self):
         """Runs the correct step of the observer update.
 
         In one update step, this should be run before predict_observer().
         """
-        if self.nonlinear:
+        if self.f:
             self.kalman_gain = (
                 self.P
                 @ self.sysd.C.T
@@ -118,10 +117,17 @@ class System:
         """
         u = self.K @ (self.r - self.x_hat)
         if next_r is not self.__default:
-            uff = self.Kff @ (next_r - self.sysd.A @ self.r)
+            if self.f:
+                rdot = (next_r - self.r) / self.dt
+                uff = self.Kff @ (rdot - self.f(self.r, np.zeros(self.u.shape)))
+            else:
+                uff = self.Kff @ (next_r - self.sysd.A @ self.r)
             self.r = next_r
         else:
-            uff = self.Kff @ (self.r - self.sysd.A @ self.r)
+            if self.f:
+                uff = -self.Kff @ self.f(self.r, np.zeros(self.u.shape))
+            else:
+                uff = self.Kff @ (self.r - self.sysd.A @ self.r)
         self.u = np.clip(u + uff, self.u_min, self.u_max)
 
     @abc.abstractmethod
@@ -149,6 +155,8 @@ class System:
         R_elems -- a vector of the maximum allowed excursions of the control
                    inputs from no actuation.
         """
+        from . import lqr
+
         Q = self.__make_cost_matrix(Q_elems)
         R = self.__make_cost_matrix(R_elems)
         self.K = lqr(self.sysd, Q, R)
@@ -177,7 +185,9 @@ class System:
         """
         self.Q = self.__make_cov_matrix(Q_elems)
         self.R = self.__make_cov_matrix(R_elems)
-        if not self.nonlinear:
+        if not self.f:
+            from . import kalmd
+
             self.kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
         else:
             m = self.sysd.A.shape[0]
@@ -206,12 +216,14 @@ class System:
         L = cnt.place(self.sysd.A.T, self.sysd.C.T, poles).T
         self.kalman_gain = np.linalg.inv(self.sysd.A) @ L
 
-    def design_two_state_feedforward(self, Q_elems, R_elems):
+    def design_two_state_feedforward(self, Q_elems=None, R_elems=None):
         """Computes the feedforward constant for a two-state controller.
 
         This will take the form u = K_ff * (r_{n+1} - A r_n), where K_ff is the
         feed-forwards constant. It is important that Kff is *only* computed off
         the goal and not the feedback terms.
+
+        If either Q_elems or R_elems is not specified, then both are ignored.
 
         Keyword arguments:
         Q_elems -- a vector of the maximum allowed excursions in the state
@@ -219,14 +231,31 @@ class System:
         R_elems -- a vector of the maximum allowed excursions of the control
                    inputs from no actuation.
         """
-        # We want to find the optimal U such that we minimize the tracking cost.
-        # This means that we want to minimize
-        #   (B u - (r_{n+1} - A r_n))^T Q (B u - (r_{n+1} - A r_n)) + u^T R u
-        Q = self.__make_cost_matrix(Q_elems)
-        R = self.__make_cost_matrix(R_elems)
-        self.Kff = (
-            np.linalg.inv(self.sysd.B.T @ Q @ self.sysd.B + R.T) @ self.sysd.B.T @ Q
-        )
+        if Q_elems is not None and R_elems is not None:
+            # We want to find the optimal U such that we minimize the tracking
+            # cost. This means that we want to minimize
+            #   (B u - (r_{n+1} - A r_n))^T Q (B u - (r_{n+1} - A r_n)) + u^T R u
+            Q = self.__make_cost_matrix(Q_elems)
+            R = self.__make_cost_matrix(R_elems)
+            if self.f:
+                self.Kff = (
+                    np.linalg.inv(self.sysc.B.T @ Q @ self.sysc.B + R.T)
+                    @ self.sysc.B.T
+                    @ Q
+                )
+            else:
+                self.Kff = (
+                    np.linalg.inv(self.sysd.B.T @ Q @ self.sysd.B + R.T)
+                    @ self.sysd.B.T
+                    @ Q
+                )
+        else:
+            # Without Q and R weighting matrices, K_ff = B^+ where B^+ is the
+            # Moore-Penrose pseudoinverse of B.
+            if self.f:
+                self.Kff = np.linalg.pinv(self.sysc.B)
+            else:
+                self.Kff = np.linalg.pinv(self.sysd.B)
 
     def plot_pzmaps(self):
         """Plots pole-zero maps of open-loop system, closed-loop system, and
@@ -279,7 +308,7 @@ class System:
         u_rec -- recording of inputs
 
         Keyword arguments:
-        time -- list of timesteps corresponding to references
+        t -- list of timesteps corresponding to references
         refs -- list of reference vectors, one for each time
         """
         x_rec = np.zeros((self.sysd.states, 0))
@@ -287,6 +316,7 @@ class System:
         u_rec = np.zeros((self.sysd.inputs, 0))
 
         # Run simulation
+        self.r = refs[0]
         for i in range(len(refs)):
             next_r = refs[i]
             self.update(next_r)
@@ -310,7 +340,15 @@ class System:
         subplot_max = self.sysd.states + self.sysd.inputs
         for i in range(self.sysd.states):
             plt.subplot(subplot_max, 1, i + 1)
-            plt.ylabel(self.state_labels[i])
+            if self.sysd.states + self.sysd.inputs > 3:
+                plt.ylabel(
+                    self.state_labels[i],
+                    horizontalalignment="right",
+                    verticalalignment="center",
+                    rotation=45,
+                )
+            else:
+                plt.ylabel(self.state_labels[i])
             if i == 0:
                 plt.title("Time-domain responses")
             plt.plot(t, self.extract_row(x_rec, i), label="Estimated state")
@@ -319,7 +357,15 @@ class System:
 
         for i in range(self.sysd.inputs):
             plt.subplot(subplot_max, 1, self.sysd.states + i + 1)
-            plt.ylabel(self.u_labels[i])
+            if self.sysd.states + self.sysd.inputs > 3:
+                plt.ylabel(
+                    self.u_labels[i],
+                    horizontalalignment="right",
+                    verticalalignment="center",
+                    rotation=45,
+                )
+            else:
+                plt.ylabel(self.u_labels[i])
             plt.plot(t, self.extract_row(u_rec, i), label="Control effort")
             plt.legend()
         plt.xlabel("Time (s)")
@@ -393,7 +439,9 @@ class System:
         period_variant -- True to use PeriodVariantLoop, False to use
                           StateSpaceLoop
         """
-        system_writer = frccnt.system_writer.SystemWriter(
+        from . import system_writer
+
+        system_writer = system_writer.SystemWriter(
             self, class_name, header_path_prefix, header_extension, period_variant
         )
         system_writer.write_cpp_header()
