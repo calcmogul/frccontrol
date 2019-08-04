@@ -1,6 +1,6 @@
 """Control system utility functions."""
 
-import control as cnt
+import control as ct
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -26,7 +26,7 @@ def dpzmap(sys, title):
     sys -- the system to plot
     title -- the title of the plot
     """
-    cnt.pzmap(sys, title=title)
+    ct.pzmap(sys, title=title)
     circle = plt.Circle((0, 0), radius=1, fill=False)
     ax = plt.gca()
     ax.add_artist(circle)
@@ -46,7 +46,7 @@ def closed_loop_ctrl(system):
     Returns:
     StateSpace instance representing closed-loop controller.
     """
-    return cnt.StateSpace(
+    return ct.StateSpace(
         system.sysd.A - system.sysd.B @ system.K,
         system.sysd.B @ system.K,
         system.sysd.C - system.sysd.D @ system.K,
@@ -60,7 +60,7 @@ def plot_observer_poles(system):
     Keyword arguments:
     system -- a System instance
     """
-    sys_cl = cnt.StateSpace(
+    sys_cl = ct.StateSpace(
         system.sysd.A - system.sysd.A @ system.kalman_gain @ system.sysd.C,
         system.sysd.B,
         system.sysd.C,

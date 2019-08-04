@@ -8,12 +8,12 @@ if "--noninteractive" in sys.argv:
 
     mpl.use("svg")
 
-import frccontrol as frccnt
+import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class Elevator(frccnt.System):
+class Elevator(fct.System):
     def __init__(self, dt):
         """Elevator subsystem.
 
@@ -24,7 +24,7 @@ class Elevator(frccnt.System):
         u_labels = [("Voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
-        frccnt.System.__init__(
+        fct.System.__init__(
             self, np.zeros((2, 1)), np.array([[-12.0]]), np.array([[12.0]]), dt
         )
 
@@ -38,7 +38,7 @@ class Elevator(frccnt.System):
         # Gear ratio
         G = 42.0 / 12.0 * 40.0 / 14.0
 
-        return frccnt.models.elevator(frccnt.models.MOTOR_CIM, num_motors, m, r, G)
+        return fct.models.elevator(fct.models.MOTOR_CIM, num_motors, m, r, G)
 
     def design_controller_observer(self):
         q = [0.02, 0.4]

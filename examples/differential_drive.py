@@ -8,12 +8,12 @@ if "--noninteractive" in sys.argv:
 
     mpl.use("svg")
 
-import frccontrol as frccnt
+import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class DifferentialDrive(frccnt.System):
+class DifferentialDrive(fct.System):
     def __init__(self, dt):
         """DifferentialDrive subsystem.
 
@@ -31,7 +31,7 @@ class DifferentialDrive(frccnt.System):
 
         u_min = np.array([[-12.0], [-12.0]])
         u_max = np.array([[12.0], [12.0]])
-        frccnt.System.__init__(self, np.zeros((4, 1)), u_min, u_max, dt)
+        fct.System.__init__(self, np.zeros((4, 1)), u_min, u_max, dt)
 
     def create_model(self, states):
         self.in_low_gear = False
@@ -60,8 +60,8 @@ class DifferentialDrive(frccnt.System):
             Gl = Ghigh
             Gr = Ghigh
 
-        return frccnt.models.differential_drive(
-            frccnt.models.MOTOR_CIM, num_motors, m, r, rb, J, Gl, Gr
+        return fct.models.differential_drive(
+            fct.models.MOTOR_CIM, num_motors, m, r, rb, J, Gl, Gr
         )
 
     def design_controller_observer(self):
@@ -107,7 +107,7 @@ def main():
     if "--save-plots" in sys.argv:
         plt.savefig("differential_drive_pzmaps.svg")
 
-    t, xprof, vprof, aprof = frccnt.generate_s_curve_profile(
+    t, xprof, vprof, aprof = fct.generate_s_curve_profile(
         max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
     )
 

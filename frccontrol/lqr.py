@@ -1,4 +1,4 @@
-import control as cnt
+import control as ct
 import numpy as np
 import scipy as sp
 
@@ -24,7 +24,7 @@ def lqr(sys, Q, R):
     """
     m = sys.A.shape[0]
 
-    controllability_rank = np.linalg.matrix_rank(cnt.ctrb(sys.A, sys.B))
+    controllability_rank = np.linalg.matrix_rank(ct.ctrb(sys.A, sys.B))
     if controllability_rank != m:
         print(
             "Warning: Controllability of %d != %d, uncontrollable state"

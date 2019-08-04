@@ -3,8 +3,8 @@ designing controllers for them.
 """
 
 import abc
-import control as cnt
-import frccontrol as frccnt
+import control as ct
+import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
@@ -172,7 +172,7 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        self.K = cnt.place(self.sysd.A, self.sysd.B, poles)
+        self.K = ct.place(self.sysd.A, self.sysd.B, poles)
 
     def design_kalman_filter(self, Q_elems, R_elems):
         """Design a discrete time Kalman filter for the system.
@@ -213,7 +213,7 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        L = cnt.place(self.sysd.A.T, self.sysd.C.T, poles).T
+        L = ct.place(self.sysd.A.T, self.sysd.C.T, poles).T
         self.kalman_gain = np.linalg.inv(self.sysd.A) @ L
 
     def design_two_state_feedforward(self, Q_elems=None, R_elems=None):
@@ -265,17 +265,17 @@ class System:
         print("Open-loop poles =", self.sysd.pole())
         print("Open-loop zeroes =", self.sysd.zero())
         plt.subplot(2, 2, 1)
-        frccnt.dpzmap(self.sysd, title="Open-loop system")
+        fct.dpzmap(self.sysd, title="Open-loop system")
 
         # Plot pole-zero map of closed-loop system
-        sys = frccnt.closed_loop_ctrl(self)
+        sys = fct.closed_loop_ctrl(self)
         print("Closed-loop poles =", sys.pole())
         print("Closed-loop zeroes =", sys.zero())
         plt.subplot(2, 2, 2)
-        frccnt.dpzmap(sys, title="Closed-loop system")
+        fct.dpzmap(sys, title="Closed-loop system")
 
         # Plot observer poles
-        sys = cnt.StateSpace(
+        sys = ct.StateSpace(
             self.sysd.A - self.sysd.A @ self.kalman_gain @ self.sysd.C,
             self.sysd.B,
             self.sysd.C,
@@ -283,7 +283,7 @@ class System:
         )
         print("Observer poles =", sys.pole())
         plt.subplot(2, 2, 3)
-        frccnt.plot_observer_poles(self)
+        fct.plot_observer_poles(self)
 
         plt.tight_layout()
 
