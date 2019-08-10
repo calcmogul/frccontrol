@@ -19,51 +19,104 @@ def conv(polynomial, *args):
     return polynomial
 
 
-def dpzmap(sys, title):
+def pzmap(sys, title):
     """Plot poles and zeroes of discrete system.
 
     Keyword arguments:
     sys -- the system to plot
     title -- the title of the plot
     """
-    ct.pzmap(sys, title=title)
-    circle = plt.Circle((0, 0), radius=1, fill=False)
-    ax = plt.gca()
-    ax.add_artist(circle)
-    plt.xlim([-1, 1])
-    plt.ylim([-1, 1])
-    x0, x1 = ax.get_xlim()
-    y0, y1 = ax.get_ylim()
-    ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+    poles = sys.pole()
+    zeros = sys.zero()
+
+    if sys.dt != None:
+        ax, fig = ct.grid.zgrid()
+    else:
+        ax, fig = ct.grid.sgrid()
+
+    # Plot the locations of the poles and zeros
+    if len(poles) > 0:
+        ax.scatter(np.real(poles), np.imag(poles), s=50, marker="x", facecolors="k")
+    if len(zeros) > 0:
+        ax.scatter(
+            np.real(zeros),
+            np.imag(zeros),
+            s=50,
+            marker="o",
+            facecolors="none",
+            edgecolors="k",
+        )
+
+    plt.title(title)
+
+    if sys.dt != None:
+        circle = plt.Circle((0, 0), radius=1, fill=False)
+        ax.add_artist(circle)
+        plt.xlim([-1, 1])
+        plt.ylim([-1, 1])
+        x0, x1 = ax.get_xlim()
+        y0, y1 = ax.get_ylim()
+        ax.set_aspect(abs(x1 - x0) / abs(y1 - y0))
 
 
-def closed_loop_ctrl(system):
-    """Constructs the closed-loop system for a discrete controller.
+def plot_open_loop_poles(system, discrete=True):
+    """Plot open-loop poles.
 
     Keyword arguments:
     system -- a System instance
-
-    Returns:
-    StateSpace instance representing closed-loop controller.
+    discrete -- whether to make pole-zero map of continuous or discrete version
+                of system
     """
-    return ct.StateSpace(
-        system.sysd.A - system.sysd.B @ system.K,
-        system.sysd.B @ system.K,
-        system.sysd.C - system.sysd.D @ system.K,
-        system.sysd.D @ system.K,
+    if discrete:
+        ss = system.sysd
+    else:
+        ss = system.sysc
+
+    print("Open-loop poles =", ss.pole())
+    print("Open-loop zeroes =", ss.zero())
+    pzmap(ss, title="Open-loop pole-zero map")
+
+
+def plot_closed_loop_poles(system, discrete=True):
+    """Plot closed-loop poles.
+
+    Keyword arguments:
+    system -- a System instance
+    discrete -- whether to make pole-zero map of continuous or discrete version
+                of system
+    """
+    if discrete:
+        ss = system.sysd
+    else:
+        ss = system.sysc
+
+    ss_cl = ct.StateSpace(
+        ss.A - ss.B @ system.K,
+        ss.B @ system.K,
+        ss.C - ss.D @ system.K,
+        ss.D @ system.K,
+        ss.dt,
     )
+    print("Closed-loop poles =", ss_cl.pole())
+    print("Closed-loop zeroes =", ss_cl.zero())
+    pzmap(ss_cl, title="Closed-loop pole-zero map")
 
 
-def plot_observer_poles(system):
+def plot_observer_poles(system, discrete=True):
     """Plot discrete observer poles.
 
     Keyword arguments:
     system -- a System instance
+    discrete -- whether to make pole-zero map of continuous or discrete version
+                of system
     """
-    sys_cl = ct.StateSpace(
-        system.sysd.A - system.sysd.A @ system.kalman_gain @ system.sysd.C,
-        system.sysd.B,
-        system.sysd.C,
-        system.sysd.D,
+    if discrete:
+        ss = system.sysd
+    else:
+        ss = system.sysc
+
+    ss_cl = ct.StateSpace(
+        ss.A - ss.A @ system.kalman_gain @ ss.C, ss.B, ss.C, ss.D, ss.dt
     )
-    dpzmap(sys_cl, title="Observer poles")
+    print("Observer poles =", ss_cl.pole())
+    pzmap(ss_cl, title="Observer poles")

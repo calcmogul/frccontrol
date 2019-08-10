@@ -66,12 +66,14 @@ def main():
         try:
             import slycot
 
-            plt.figure(1)
             elevator.plot_pzmaps()
         except ImportError:  # Slycot unavailable. Can't show pzmaps.
             pass
     if "--save-plots" in sys.argv:
-        plt.savefig("elevator_pzmaps.svg")
+        names = ["open-loop", "closed-loop", "observer"]
+        for i in range(3):
+            plt.figure(i + 1)
+            plt.savefig(f"elevator_pzmap_{names[i]}.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -92,7 +94,7 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(2)
+        plt.figure()
         x_rec, ref_rec, u_rec = elevator.generate_time_responses(t, refs)
         elevator.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:

@@ -70,12 +70,14 @@ def main():
         try:
             import slycot
 
-            plt.figure(1)
             single_jointed_arm.plot_pzmaps()
         except ImportError:  # Slycot unavailable. Can't show pzmaps.
             pass
     if "--save-plots" in sys.argv:
-        plt.savefig("single_jointed_arm_pzmaps.svg")
+        names = ["open-loop", "closed-loop", "observer"]
+        for i in range(3):
+            plt.figure(i + 1)
+            plt.savefig(f"single_jointed_arm_pzmap_{names[i]}.svg")
 
     t, xprof, vprof, aprof = fct.generate_s_curve_profile(
         max_v=0.5, max_a=1, time_to_max_a=0.5, dt=dt, goal=1.04
@@ -88,7 +90,7 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(2)
+        plt.figure()
         x_rec, ref_rec, u_rec = single_jointed_arm.generate_time_responses(t, refs)
         single_jointed_arm.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:

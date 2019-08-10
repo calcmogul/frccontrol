@@ -100,12 +100,14 @@ def main():
         try:
             import slycot
 
-            plt.figure(1)
             diff_drive.plot_pzmaps()
         except ImportError:  # Slycot unavailable. Can't show pzmaps.
             pass
     if "--save-plots" in sys.argv:
-        plt.savefig("differential_drive_pzmaps.svg")
+        names = ["open-loop", "closed-loop", "observer"]
+        for i in range(3):
+            plt.figure(i + 1)
+            plt.savefig(f"differential_drive_pzmap_{names[i]}.svg")
 
     t, xprof, vprof, aprof = fct.generate_s_curve_profile(
         max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
@@ -118,7 +120,7 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(2)
+        plt.figure()
         x_rec, ref_rec, u_rec = diff_drive.generate_time_responses(t, refs)
         diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:

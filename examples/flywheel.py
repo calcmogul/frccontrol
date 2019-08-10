@@ -63,10 +63,12 @@ def main():
     flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(1)
         flywheel.plot_pzmaps()
     if "--save-plots" in sys.argv:
-        plt.savefig("flywheel_pzmaps.svg")
+        names = ["open-loop", "closed-loop", "observer"]
+        for i in range(3):
+            plt.figure(i + 1)
+            plt.savefig(f"flywheel_pzmap_{names[i]}.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -87,7 +89,7 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(2)
+        plt.figure()
         x_rec, ref_rec, u_rec = flywheel.generate_time_responses(t, refs)
         flywheel.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:

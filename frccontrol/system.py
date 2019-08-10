@@ -259,34 +259,17 @@ class System:
             else:
                 self.Kff = np.linalg.pinv(self.sysd.B)
 
-    def plot_pzmaps(self):
+    def plot_pzmaps(self, discrete=True):
         """Plots pole-zero maps of open-loop system, closed-loop system, and
         observer poles.
+
+        Keyword arguments:
+        discrete -- whether to make pole-zero map of continuous or discrete
+                    version of system
         """
-        # Plot pole-zero map of open-loop system
-        print("Open-loop poles =", self.sysd.pole())
-        print("Open-loop zeroes =", self.sysd.zero())
-        plt.subplot(2, 2, 1)
-        fct.dpzmap(self.sysd, title="Open-loop system")
-
-        # Plot pole-zero map of closed-loop system
-        sys = fct.closed_loop_ctrl(self)
-        print("Closed-loop poles =", sys.pole())
-        print("Closed-loop zeroes =", sys.zero())
-        plt.subplot(2, 2, 2)
-        fct.dpzmap(sys, title="Closed-loop system")
-
-        # Plot observer poles
-        sys = ct.StateSpace(
-            self.sysd.A - self.sysd.A @ self.kalman_gain @ self.sysd.C,
-            self.sysd.B,
-            self.sysd.C,
-            self.sysd.D,
-        )
-        print("Observer poles =", sys.pole())
-        plt.subplot(2, 2, 3)
-        fct.plot_observer_poles(self)
-
+        fct.plot_open_loop_poles(self, discrete)
+        fct.plot_closed_loop_poles(self, discrete)
+        fct.plot_observer_poles(self, discrete)
         plt.tight_layout()
 
     def extract_row(self, buf, idx):
