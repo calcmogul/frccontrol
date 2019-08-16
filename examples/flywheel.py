@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Avoid needing display if plots aren't being shown
 import sys
 
 if "--noninteractive" in sys.argv:
@@ -62,9 +61,8 @@ def main():
     flywheel = Flywheel(dt)
     flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        flywheel.plot_pzmaps()
-    if "--save-plots" in sys.argv:
+    flywheel.plot_pzmaps()
+    if "--noninteractive" in sys.argv:
         names = ["open-loop", "closed-loop", "observer"]
         for i in range(3):
             plt.figure(i + 1)
@@ -88,12 +86,11 @@ def main():
             r = np.array([[0]])
         refs.append(r)
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        x_rec, ref_rec, u_rec, y_rec = flywheel.generate_time_responses(t, refs)
-        flywheel.plot_time_responses(t, x_rec, ref_rec, u_rec)
-    if "--save-plots" in sys.argv:
+    x_rec, ref_rec, u_rec, y_rec = flywheel.generate_time_responses(t, refs)
+    flywheel.plot_time_responses(t, x_rec, ref_rec, u_rec)
+    if "--noninteractive" in sys.argv:
         plt.savefig("flywheel_response.svg")
-    if "--noninteractive" not in sys.argv:
+    else:
         plt.show()
 
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Avoid needing display if plots aren't being shown
 import sys
 
 if "--noninteractive" in sys.argv:
@@ -96,14 +95,13 @@ def main():
     diff_drive = DifferentialDrive(dt)
     diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/")
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        try:
-            import slycot
+    try:
+        import slycot
 
-            diff_drive.plot_pzmaps()
-        except ImportError:  # Slycot unavailable. Can't show pzmaps.
-            pass
-    if "--save-plots" in sys.argv:
+        diff_drive.plot_pzmaps()
+    except ImportError:  # Slycot unavailable. Can't show pzmaps.
+        pass
+    if "--noninteractive" in sys.argv:
         names = ["open-loop", "closed-loop", "observer"]
         for i in range(3):
             plt.figure(i + 1)
@@ -119,12 +117,11 @@ def main():
         r = np.array([[xprof[i]], [vprof[i]], [xprof[i]], [vprof[i]]])
         refs.append(r)
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        x_rec, ref_rec, u_rec, y_rec = diff_drive.generate_time_responses(t, refs)
-        diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
-    if "--save-plots" in sys.argv:
+    x_rec, ref_rec, u_rec, y_rec = diff_drive.generate_time_responses(t, refs)
+    diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
+    if "--noninteractive" in sys.argv:
         plt.savefig("differential_drive_response.svg")
-    if "--noninteractive" not in sys.argv:
+    else:
         plt.show()
 
 
