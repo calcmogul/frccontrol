@@ -325,6 +325,7 @@ class System:
         ref_rec -- recording of references from generate_time_responses()
         u_rec -- recording of inputs from generate_time_responses()
         """
+        plt.figure()
         subplot_max = self.sysd.states + self.sysd.inputs
         for i in range(self.sysd.states):
             plt.subplot(subplot_max, 1, i + 1)

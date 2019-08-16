@@ -120,7 +120,6 @@ def main():
         refs.append(r)
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure()
         x_rec, ref_rec, u_rec, y_rec = diff_drive.generate_time_responses(t, refs)
         diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
     if "--save-plots" in sys.argv:
