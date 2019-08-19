@@ -62,6 +62,7 @@ def main():
     dt = 0.00505
     single_jointed_arm = SingleJointedArm(dt)
     single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "subsystems/")
+    single_jointed_arm.export_java_coeffs("SingleJointedArm")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         try:

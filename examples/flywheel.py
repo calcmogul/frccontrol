@@ -56,6 +56,7 @@ def main():
     dt = 0.00505
     flywheel = Flywheel(dt)
     flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
+    flywheel.export_java_coeffs("Flywheel")
 
     if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
         plt.figure(1)
