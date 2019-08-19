@@ -199,17 +199,18 @@ class SystemWriter:
             print("}", file=source_file)
 
     def write_java_source(self):
-        prefix = "import edu.wpi.first.wpilibj."
+        wpilibj_prefix = "import edu.wpi.first.wpilibj."
+        wpiutil_prefix = "import edu.wpi.first.wpiutil."
         imports = []
         # State space types
-        imports.append(prefix + "controller." + self.plant_coeffs_header + ";")
-        imports.append(prefix + "controller." + self.ctrl_coeffs_header + ";")
-        imports.append(prefix + "controller." + self.obsv_coeffs_header + ";")
-        imports.append(prefix + "controller." + self.loop_header + ";")
+        imports.append(wpilibj_prefix + "controller." + self.plant_coeffs_header + ";")
+        imports.append(wpilibj_prefix + "controller." + self.ctrl_coeffs_header + ";")
+        imports.append(wpilibj_prefix + "controller." + self.obsv_coeffs_header + ";")
+        imports.append(wpilibj_prefix + "controller." + self.loop_header + ";")
 
         # Number types and matrices
-        imports.append(prefix + "math.numbers.*;")
-        imports.append(prefix + "math.*;")
+        imports.append(wpiutil_prefix + "math.numbers.*;")
+        imports.append(wpiutil_prefix + "math.*;")
 
         with open(
                 self.class_name + "Coeffs.java", "w"
