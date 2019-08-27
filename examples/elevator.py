@@ -60,6 +60,7 @@ def main():
     dt = 0.00505
     elevator = Elevator(dt)
     elevator.export_cpp_coeffs("Elevator", "subsystems/")
+    elevator.export_java_coeffs("Elevator")
 
     try:
         import slycot

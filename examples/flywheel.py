@@ -60,6 +60,7 @@ def main():
     dt = 0.00505
     flywheel = Flywheel(dt)
     flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
+    flywheel.export_java_coeffs("Flywheel")
 
     flywheel.plot_pzmaps()
     if "--noninteractive" in sys.argv:

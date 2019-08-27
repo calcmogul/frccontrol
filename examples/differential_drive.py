@@ -94,6 +94,7 @@ def main():
     dt = 0.00505
     diff_drive = DifferentialDrive(dt)
     diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/")
+    diff_drive.export_java_coeffs("DifferentialDrive")
 
     try:
         import slycot
