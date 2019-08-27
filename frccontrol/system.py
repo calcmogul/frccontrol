@@ -404,14 +404,6 @@ class System:
         """
         return np.diag(np.square(elems))
 
-    def export_java_coeffs(self,
-                             class_name,
-                             period_variant=False):
-        """Exports matrices to a Java source file"""
-
-        system_writer = frccnt.system_writer.SystemWriter(self, class_name, "", "", period_variant)
-        system_writer.write_java_source()
-
     def export_cpp_coeffs(
         self,
         class_name,
@@ -435,3 +427,16 @@ class System:
         )
         system_writer.write_cpp_header()
         system_writer.write_cpp_source()
+
+    def export_java_coeffs(self, class_name, period_variant=False):
+        """Exports matrices to a Java source file.
+
+        Keyword arguments:
+        class_name -- subsystem class name in camel case
+        period_variant -- True to use PeriodVariantLoop, False to use
+                          StateSpaceLoop
+        """
+        system_writer = fct.system_writer.SystemWriter(
+            self, class_name, "", "", period_variant
+        )
+        system_writer.write_java_source()

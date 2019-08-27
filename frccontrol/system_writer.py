@@ -7,12 +7,12 @@ import os
 
 class SystemWriter:
     def __init__(
-            self,
-            system,
-            class_name,
-            header_path_prefix,
-            header_extension,
-            period_variant=False,
+        self,
+        system,
+        class_name,
+        header_path_prefix,
+        header_extension,
+        period_variant=False,
     ):
         """Exports matrices to pair of C++ source files.
 
@@ -29,23 +29,23 @@ class SystemWriter:
         self.header_path_prefix = header_path_prefix
         self.header_extension = header_extension
         template_cpp = (
-                "<"
-                + str(system.sysd.A.shape[0])
-                + ", "
-                + str(system.sysd.B.shape[1])
-                + ", "
-                + str(system.sysd.C.shape[0])
-                + ">"
+            "<"
+            + str(system.sysd.A.shape[0])
+            + ", "
+            + str(system.sysd.B.shape[1])
+            + ", "
+            + str(system.sysd.C.shape[0])
+            + ">"
         )
 
         template_java = (
-                "<N"
-                + str(system.sysd.A.shape[0])
-                + ", N"
-                + str(system.sysd.B.shape[1])
-                + ", N"
-                + str(system.sysd.C.shape[0])
-                + ">"
+            "<N"
+            + str(system.sysd.A.shape[0])
+            + ", N"
+            + str(system.sysd.B.shape[1])
+            + ", N"
+            + str(system.sysd.C.shape[0])
+            + ">"
         )
 
         self.period_variant = period_variant
@@ -81,7 +81,7 @@ class SystemWriter:
         headers.append(prefix + self.loop_header + ".h>")
 
         with open(
-                self.class_name + "Coeffs." + self.header_extension, "w"
+            self.class_name + "Coeffs." + self.header_extension, "w"
         ) as header_file:
             print("#pragma once" + os.linesep, file=header_file)
             for header in sorted(headers):
@@ -91,7 +91,10 @@ class SystemWriter:
                 header_file, self.plant_coeffs_type_cpp, "PlantCoeffs", in_header=True
             )
             self.__write_cpp_func_name(
-                header_file, self.ctrl_coeffs_type_cpp, "ControllerCoeffs", in_header=True
+                header_file,
+                self.ctrl_coeffs_type_cpp,
+                "ControllerCoeffs",
+                in_header=True,
             )
             self.__write_cpp_func_name(
                 header_file, self.obsv_coeffs_type_cpp, "ObserverCoeffs", in_header=True
@@ -146,7 +149,10 @@ class SystemWriter:
 
             # Write MakeControllerCoeffs()
             self.__write_cpp_func_name(
-                source_file, self.ctrl_coeffs_type_cpp, "ControllerCoeffs", in_header=False
+                source_file,
+                self.ctrl_coeffs_type_cpp,
+                "ControllerCoeffs",
+                in_header=False,
             )
             self.__write_cpp_matrix(source_file, self.system.K, "K")
             self.__write_cpp_matrix(source_file, self.system.Kff, "Kff")
@@ -160,7 +166,10 @@ class SystemWriter:
 
             # Write MakeObserverCoeffs()
             self.__write_cpp_func_name(
-                source_file, self.obsv_coeffs_type_cpp, "ObserverCoeffs", in_header=False
+                source_file,
+                self.obsv_coeffs_type_cpp,
+                "ObserverCoeffs",
+                in_header=False,
             )
             if self.period_variant:
                 self.__write_cpp_matrix(source_file, self.system.Q, "Qcontinuous")
@@ -175,7 +184,9 @@ class SystemWriter:
                 print(space_prefix + "PsteadyState);", file=source_file)
             else:
                 self.__write_cpp_matrix(source_file, self.system.kalman_gain, "K")
-                print("  return " + self.obsv_coeffs_type_cpp + "(K);", file=source_file)
+                print(
+                    "  return " + self.obsv_coeffs_type_cpp + "(K);", file=source_file
+                )
             print("}" + os.linesep, file=source_file)
 
             # Write MakeLoop()
@@ -202,6 +213,7 @@ class SystemWriter:
         wpilibj_prefix = "import edu.wpi.first.wpilibj."
         wpiutil_prefix = "import edu.wpi.first.wpiutil."
         imports = []
+
         # State space types
         imports.append(wpilibj_prefix + "controller." + self.plant_coeffs_header + ";")
         imports.append(wpilibj_prefix + "controller." + self.ctrl_coeffs_header + ";")
@@ -212,9 +224,7 @@ class SystemWriter:
         imports.append(wpiutil_prefix + "math.numbers.*;")
         imports.append(wpiutil_prefix + "math.*;")
 
-        with open(
-                self.class_name + "Coeffs.java", "w"
-        ) as source_file:
+        with open(self.class_name + "Coeffs.java", "w") as source_file:
             for imp in sorted(imports):
                 print(imp, file=source_file)
 
@@ -226,17 +236,27 @@ class SystemWriter:
             inputs = "Nat.N" + str(self.system.sysd.B.shape[1]) + "()"
             outputs = "Nat.N" + str(self.system.sysd.C.shape[0]) + "()"
             # MakePlantCoeffs()
-            self.__write_java_func_name(source_file, self.plant_coeffs_type_java, "PlantCoeffs")
+            self.__write_java_func_name(
+                source_file, self.plant_coeffs_type_java, "PlantCoeffs"
+            )
             if self.period_variant:
                 self.__write_java_matrix(source_file, self.system.sysc.A, "Acontinuous")
                 self.__write_java_matrix(source_file, self.system.sysc.B, "Bcontinuous")
                 self.__write_java_matrix(source_file, self.system.sysd.C, "C")
                 self.__write_java_matrix(source_file, self.system.sysd.D, "D")
 
-                print("    return " +
-                      self.plant_coeffs_type_java +
-                      "(" + states + ", " + inputs + ", " + outputs + ", Acontinuous, Bcontinuous, C, D);",
-                      file=source_file)
+                print(
+                    "    return "
+                    + self.plant_coeffs_type_java
+                    + "("
+                    + states
+                    + ", "
+                    + inputs
+                    + ", "
+                    + outputs
+                    + ", Acontinuous, Bcontinuous, C, D);",
+                    file=source_file,
+                )
             else:
                 self.__write_java_matrix(source_file, self.system.sysd.A, "A")
                 self.__write_java_matrix(source_file, self.system.sysd.B, "B")
@@ -244,23 +264,39 @@ class SystemWriter:
                 self.__write_java_matrix(source_file, self.system.sysd.D, "D")
 
                 print(
-                    "    return new " + self.plant_coeffs_type_java + "(" + states + ", " + inputs + ", " + outputs + ", A, B, C, D);",
-                    file=source_file)
+                    "    return new "
+                    + self.plant_coeffs_type_java
+                    + "("
+                    + states
+                    + ", "
+                    + inputs
+                    + ", "
+                    + outputs
+                    + ", A, B, C, D);",
+                    file=source_file,
+                )
             print("  }" + os.linesep, file=source_file)
 
             # MakeControllerCoeffs()
-            self.__write_java_func_name(source_file, self.ctrl_coeffs_type_java, "ControllerCoeffs")
+            self.__write_java_func_name(
+                source_file, self.ctrl_coeffs_type_java, "ControllerCoeffs"
+            )
             self.__write_java_matrix(source_file, self.system.K, "K")
             self.__write_java_matrix(source_file, self.system.Kff, "Kff")
             self.__write_java_matrix(source_file, self.system.u_min, "Umin")
             self.__write_java_matrix(source_file, self.system.u_max, "Umax")
-            print("    return new " + self.ctrl_coeffs_type_java + "(K, Kff, Umin, Umax);", file=source_file)
+            print(
+                "    return new "
+                + self.ctrl_coeffs_type_java
+                + "(K, Kff, Umin, Umax);",
+                file=source_file,
+            )
             print("  }" + os.linesep, file=source_file)
 
             # MakeObserverCoeffs()
-
-            self.__write_java_func_name(source_file, self.obsv_coeffs_type_java, "ObserverCoeffs")
-
+            self.__write_java_func_name(
+                source_file, self.obsv_coeffs_type_java, "ObserverCoeffs"
+            )
             if self.period_variant:
                 self.__write_java_matrix(source_file, self.system.Q, "Qcontinuous")
                 self.__write_java_matrix(source_file, self.system.R, "Rcontinuous")
@@ -274,13 +310,14 @@ class SystemWriter:
                 print(space_prefix + "PsteadyState);", file=source_file)
             else:
                 self.__write_java_matrix(source_file, self.system.kalman_gain, "K")
-                print("    return new " + self.obsv_coeffs_type_java + "(K);", file=source_file)
+                print(
+                    "    return new " + self.obsv_coeffs_type_java + "(K);",
+                    file=source_file,
+                )
             print("  }" + os.linesep, file=source_file)
 
             # Write MakeLoop()
-            self.__write_java_func_name(
-                source_file, self.loop_type_java, "Loop"
-            )
+            self.__write_java_func_name(source_file, self.loop_type_java, "Loop")
             first_line_prefix = "    return new " + self.loop_type_java + "("
             space_prefix = " " * len(first_line_prefix)
             print(
@@ -356,17 +393,19 @@ class SystemWriter:
     def __write_java_matrix(self, java_file, matrix, matrix_name):
         row_major_data = np.ravel(matrix)
         # Matrix<R, C> <name> = MatrixUtils.mat(R, C).fill(
-        decl = "    Matrix<N" \
-               + str(matrix.shape[0]) \
-               + ", N" \
-               + str(matrix.shape[1]) \
-               + "> " \
-               + matrix_name \
-               + " = MatrixUtils.mat(Nat.N" \
-               + str(matrix.shape[0]) \
-               + "(), Nat.N" \
-               + str(matrix.shape[1]) \
-               + "()).fill("
+        decl = (
+            "    Matrix<N"
+            + str(matrix.shape[0])
+            + ", N"
+            + str(matrix.shape[1])
+            + "> "
+            + matrix_name
+            + " = MatrixUtils.mat(Nat.N"
+            + str(matrix.shape[0])
+            + "(), Nat.N"
+            + str(matrix.shape[1])
+            + "()).fill("
+        )
 
         for (i, value) in enumerate(row_major_data):
             decl += str(value)
