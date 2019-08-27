@@ -1,4 +1,4 @@
-import control as cnt
+import control as ct
 import numpy as np
 
 
@@ -99,7 +99,7 @@ def elevator(motor, num_motors, m, r, G):
     D = np.array([[0]])
     # fmt: on
 
-    return cnt.ss(A, B, C, D)
+    return ct.ss(A, B, C, D)
 
 
 def flywheel(motor, num_motors, J, G):
@@ -125,7 +125,7 @@ def flywheel(motor, num_motors, J, G):
     C = np.array([[1]])
     D = np.array([[0]])
 
-    return cnt.ss(A, B, C, D)
+    return ct.ss(A, B, C, D)
 
 
 def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
@@ -170,7 +170,7 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
                   [0, 0]])
     # fmt: on
 
-    return cnt.ss(A, B, C, D)
+    return ct.ss(A, B, C, D)
 
 
 def single_jointed_arm(motor, num_motors, J, G):
@@ -196,4 +196,4 @@ def single_jointed_arm(motor, num_motors, J, G):
     C = np.array([[1, 0]])
     D = np.array([[0]])
 
-    return cnt.ss(A, B, C, D)
+    return ct.ss(A, B, C, D)

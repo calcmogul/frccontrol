@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Avoid needing display if plots aren't being shown
 import sys
 
 if "--noninteractive" in sys.argv:
@@ -8,12 +7,12 @@ if "--noninteractive" in sys.argv:
 
     mpl.use("svg")
 
-import frccontrol as frccnt
+import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class DifferentialDrive(frccnt.System):
+class DifferentialDrive(fct.System):
     def __init__(self, dt):
         """DifferentialDrive subsystem.
 
@@ -31,9 +30,9 @@ class DifferentialDrive(frccnt.System):
 
         u_min = np.array([[-12.0], [-12.0]])
         u_max = np.array([[12.0], [12.0]])
-        frccnt.System.__init__(self, np.zeros((4, 1)), u_min, u_max, dt)
+        fct.System.__init__(self, u_min, u_max, dt, np.zeros((4, 1)), np.zeros((2, 1)))
 
-    def create_model(self, states):
+    def create_model(self, states, inputs):
         self.in_low_gear = False
 
         # Number of motors per side
@@ -60,8 +59,8 @@ class DifferentialDrive(frccnt.System):
             Gl = Ghigh
             Gr = Ghigh
 
-        return frccnt.models.differential_drive(
-            frccnt.models.MOTOR_CIM, num_motors, m, r, rb, J, Gl, Gr
+        return fct.models.differential_drive(
+            fct.models.MOTOR_CIM, num_motors, m, r, rb, J, Gl, Gr
         )
 
     def design_controller_observer(self):
@@ -97,18 +96,19 @@ def main():
     diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/")
     diff_drive.export_java_coeffs("DifferentialDrive")
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        try:
-            import slycot
+    try:
+        import slycot
 
-            plt.figure(1)
-            diff_drive.plot_pzmaps()
-        except ImportError:  # Slycot unavailable. Can't show pzmaps.
-            pass
-    if "--save-plots" in sys.argv:
-        plt.savefig("differential_drive_pzmaps.svg")
+        diff_drive.plot_pzmaps()
+    except ImportError:  # Slycot unavailable. Can't show pzmaps.
+        pass
+    if "--noninteractive" in sys.argv:
+        names = ["open-loop", "closed-loop", "observer"]
+        for i in range(3):
+            plt.figure(i + 1)
+            plt.savefig(f"differential_drive_pzmap_{names[i]}.svg")
 
-    t, xprof, vprof, aprof = frccnt.generate_s_curve_profile(
+    t, xprof, vprof, aprof = fct.generate_s_curve_profile(
         max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
     )
 
@@ -118,13 +118,11 @@ def main():
         r = np.array([[xprof[i]], [vprof[i]], [xprof[i]], [vprof[i]]])
         refs.append(r)
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(2)
-        x_rec, ref_rec, u_rec = diff_drive.generate_time_responses(t, refs)
-        diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
-    if "--save-plots" in sys.argv:
+    x_rec, ref_rec, u_rec, y_rec = diff_drive.generate_time_responses(t, refs)
+    diff_drive.plot_time_responses(t, x_rec, ref_rec, u_rec)
+    if "--noninteractive" in sys.argv:
         plt.savefig("differential_drive_response.svg")
-    if "--noninteractive" not in sys.argv:
+    else:
         plt.show()
 
 

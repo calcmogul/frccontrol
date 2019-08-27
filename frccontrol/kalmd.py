@@ -1,4 +1,4 @@
-import control as cnt
+import control as ct
 import numpy as np
 import scipy as sp
 
@@ -16,7 +16,7 @@ def kalmd(sys, Q, R):
     """
     m = sys.A.shape[0]
 
-    observability_rank = np.linalg.matrix_rank(cnt.obsv(sys.A, sys.C))
+    observability_rank = np.linalg.matrix_rank(ct.obsv(sys.A, sys.C))
     if observability_rank != m:
         print(
             "Warning: Observability of %d != %d, unobservable state"

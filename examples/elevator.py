@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# Avoid needing display if plots aren't being shown
 import sys
 
 if "--noninteractive" in sys.argv:
@@ -8,12 +7,12 @@ if "--noninteractive" in sys.argv:
 
     mpl.use("svg")
 
-import frccontrol as frccnt
+import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class Elevator(frccnt.System):
+class Elevator(fct.System):
     def __init__(self, dt):
         """Elevator subsystem.
 
@@ -24,11 +23,16 @@ class Elevator(frccnt.System):
         u_labels = [("Voltage", "V")]
         self.set_plot_labels(state_labels, u_labels)
 
-        frccnt.System.__init__(
-            self, np.zeros((2, 1)), np.array([[-12.0]]), np.array([[12.0]]), dt
+        fct.System.__init__(
+            self,
+            np.array([[-12.0]]),
+            np.array([[12.0]]),
+            dt,
+            np.zeros((2, 1)),
+            np.zeros((1, 1)),
         )
 
-    def create_model(self, states):
+    def create_model(self, states, inputs):
         # Number of motors
         num_motors = 2.0
         # Elevator carriage mass in kg
@@ -38,7 +42,7 @@ class Elevator(frccnt.System):
         # Gear ratio
         G = 42.0 / 12.0 * 40.0 / 14.0
 
-        return frccnt.models.elevator(frccnt.models.MOTOR_CIM, num_motors, m, r, G)
+        return fct.models.elevator(fct.models.MOTOR_CIM, num_motors, m, r, G)
 
     def design_controller_observer(self):
         q = [0.02, 0.4]
@@ -58,16 +62,17 @@ def main():
     elevator.export_cpp_coeffs("Elevator", "subsystems/")
     elevator.export_java_coeffs("Elevator")
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        try:
-            import slycot
+    try:
+        import slycot
 
-            plt.figure(1)
-            elevator.plot_pzmaps()
-        except ImportError:  # Slycot unavailable. Can't show pzmaps.
-            pass
-    if "--save-plots" in sys.argv:
-        plt.savefig("elevator_pzmaps.svg")
+        elevator.plot_pzmaps()
+    except ImportError:  # Slycot unavailable. Can't show pzmaps.
+        pass
+    if "--noninteractive" in sys.argv:
+        names = ["open-loop", "closed-loop", "observer"]
+        for i in range(3):
+            plt.figure(i + 1)
+            plt.savefig(f"elevator_pzmap_{names[i]}.svg")
 
     # Set up graphing
     l0 = 0.1
@@ -87,13 +92,11 @@ def main():
             r = np.array([[0.0], [0.0]])
         refs.append(r)
 
-    if "--save-plots" in sys.argv or "--noninteractive" not in sys.argv:
-        plt.figure(2)
-        x_rec, ref_rec, u_rec = elevator.generate_time_responses(t, refs)
-        elevator.plot_time_responses(t, x_rec, ref_rec, u_rec)
-    if "--save-plots" in sys.argv:
+    x_rec, ref_rec, u_rec, y_rec = elevator.generate_time_responses(t, refs)
+    elevator.plot_time_responses(t, x_rec, ref_rec, u_rec)
+    if "--noninteractive" in sys.argv:
         plt.savefig("elevator_response.svg")
-    if "--noninteractive" not in sys.argv:
+    else:
         plt.show()
 
 

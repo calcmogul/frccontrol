@@ -3,8 +3,8 @@ designing controllers for them.
 """
 
 import abc
-import control as cnt
-import frccontrol as frccnt
+import control as ct
+import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
@@ -13,26 +13,27 @@ import scipy as sp
 class System:
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, states, u_min, u_max, dt, nonlinear_func=None):
+    def __init__(self, u_min, u_max, dt, states, inputs, nonlinear_func=None):
         """Sets up the matrices for a state-space model.
 
         Keyword arguments:
-        states -- initial state vector around which to linearize model
         u_min -- vector of minimum control inputs for system
         u_max -- vector of maximum control inputs for system
         dt -- time between model/controller updates
+        states -- initial state vector around which to linearize model
+        inputs -- initial input vector around which to linearize model
         nonlinear_func -- function that takes x and u and returns the state
                           derivative for a nonlinear system (optional)
         """
         self.f = nonlinear_func
-        self.sysc = self.create_model(np.asarray(states))
+        self.sysc = self.create_model(np.asarray(states), np.asarray(inputs))
         self.dt = dt
         self.sysd = self.sysc.sample(self.dt)  # Discretize model
 
         # Model matrices
         self.x = np.zeros((self.sysc.A.shape[0], 1))
         self.x = np.asarray(states)
-        self.u = np.zeros((self.sysc.B.shape[1], 1))
+        self.u = np.asarray(inputs)
         self.y = np.zeros((self.sysc.C.shape[0], 1))
 
         # Controller matrices
@@ -131,11 +132,12 @@ class System:
         self.u = np.clip(u + uff, self.u_min, self.u_max)
 
     @abc.abstractmethod
-    def create_model(self, states=__default):
+    def create_model(self, states=__default, inputs=__default):
         """Relinearize model around given state.
 
         Keyword arguments:
         states -- state vector around which to linearize model (if applicable)
+        inputs -- input vector around which to linearize model (if applicable)
 
         Returns:
         StateSpace instance containing continuous state-space model
@@ -172,7 +174,7 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        self.K = cnt.place(self.sysd.A, self.sysd.B, poles)
+        self.K = ct.place(self.sysd.A, self.sysd.B, poles)
 
     def design_kalman_filter(self, Q_elems, R_elems):
         """Design a discrete time Kalman filter for the system.
@@ -213,7 +215,7 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        L = cnt.place(self.sysd.A.T, self.sysd.C.T, poles).T
+        L = ct.place(self.sysd.A.T, self.sysd.C.T, poles).T
         self.kalman_gain = np.linalg.inv(self.sysd.A) @ L
 
     def design_two_state_feedforward(self, Q_elems=None, R_elems=None):
@@ -257,34 +259,17 @@ class System:
             else:
                 self.Kff = np.linalg.pinv(self.sysd.B)
 
-    def plot_pzmaps(self):
+    def plot_pzmaps(self, discrete=True):
         """Plots pole-zero maps of open-loop system, closed-loop system, and
         observer poles.
+
+        Keyword arguments:
+        discrete -- whether to make pole-zero map of continuous or discrete
+                    version of system
         """
-        # Plot pole-zero map of open-loop system
-        print("Open-loop poles =", self.sysd.pole())
-        print("Open-loop zeroes =", self.sysd.zero())
-        plt.subplot(2, 2, 1)
-        frccnt.dpzmap(self.sysd, title="Open-loop system")
-
-        # Plot pole-zero map of closed-loop system
-        sys = frccnt.closed_loop_ctrl(self)
-        print("Closed-loop poles =", sys.pole())
-        print("Closed-loop zeroes =", sys.zero())
-        plt.subplot(2, 2, 2)
-        frccnt.dpzmap(sys, title="Closed-loop system")
-
-        # Plot observer poles
-        sys = cnt.StateSpace(
-            self.sysd.A - self.sysd.A @ self.kalman_gain @ self.sysd.C,
-            self.sysd.B,
-            self.sysd.C,
-            self.sysd.D,
-        )
-        print("Observer poles =", sys.pole())
-        plt.subplot(2, 2, 3)
-        frccnt.plot_observer_poles(self)
-
+        fct.plot_open_loop_poles(self, discrete)
+        fct.plot_closed_loop_poles(self, discrete)
+        fct.plot_observer_poles(self, discrete)
         plt.tight_layout()
 
     def extract_row(self, buf, idx):
@@ -306,6 +291,7 @@ class System:
         x_rec -- recording of state estimates
         ref_rec -- recording of references
         u_rec -- recording of inputs
+        y_rec -- recording of outputs
 
         Keyword arguments:
         t -- list of timesteps corresponding to references
@@ -314,6 +300,7 @@ class System:
         x_rec = np.zeros((self.sysd.states, 0))
         ref_rec = np.zeros((self.sysd.states, 0))
         u_rec = np.zeros((self.sysd.inputs, 0))
+        y_rec = np.zeros((self.sysd.outputs, 0))
 
         # Run simulation
         self.r = refs[0]
@@ -325,8 +312,9 @@ class System:
             x_rec = np.concatenate((x_rec, self.x_hat), axis=1)
             ref_rec = np.concatenate((ref_rec, self.r), axis=1)
             u_rec = np.concatenate((u_rec, self.u), axis=1)
+            y_rec = np.concatenate((y_rec, self.y), axis=1)
 
-        return x_rec, ref_rec, u_rec
+        return x_rec, ref_rec, u_rec, y_rec
 
     def plot_time_responses(self, t, x_rec, ref_rec, u_rec):
         """Plots time-domain responses of the system and the control inputs.
@@ -337,6 +325,7 @@ class System:
         ref_rec -- recording of references from generate_time_responses()
         u_rec -- recording of inputs from generate_time_responses()
         """
+        plt.figure()
         subplot_max = self.sysd.states + self.sysd.inputs
         for i in range(self.sysd.states):
             plt.subplot(subplot_max, 1, i + 1)
