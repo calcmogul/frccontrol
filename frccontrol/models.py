@@ -57,6 +57,9 @@ MOTOR_AM_9015 = DcBrushedMotor(12.0, 0.36, 71.0, 3.7, 14270.0)
 # Banebots RS 550
 MOTOR_BB_RS550 = DcBrushedMotor(12.0, 0.38, 84.0, 0.4, 19000.0)
 
+# NEO
+MOTOR_NEO = DcBrushedMotor(12.0, 2.6, 105.0, 1.8, 5676.0)
+
 
 def gearbox(motor, num_motors):
     """Returns a DcBrushedMotor with the same characteristics as the specified
