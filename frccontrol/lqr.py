@@ -9,12 +9,12 @@ def lqr(*args, **kwargs):
     For a continuous system:
 
     .. math:: xdot = A * x + B * u
-    .. math:: J = \int_0^\infty (x^T Q x + u^T R u + 2 x^T N u) dt
+    .. math:: J = \\int_0^\\infty (x^T Q x + u^T R u + 2 x^T N u) dt
 
     For a discrete system:
 
     .. math:: x(n + 1) = A x(n) + B u(n)
-    .. math:: J = \sum_0^\infty (x^T Q x + u^T R u + 2 x^T N u) \Delta T
+    .. math:: J = \\sum_0^\\infty (x^T Q x + u^T R u + 2 x^T N u) \\Delta T
 
     Keyword arguments:
     sys -- StateSpace object representing a linear system.
