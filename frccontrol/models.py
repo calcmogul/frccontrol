@@ -63,6 +63,9 @@ MOTOR_NEO = DcBrushedMotor(12.0, 2.6, 105.0, 1.8, 5676.0)
 # NEO 550
 MOTOR_NEO_550 = DcBrushedMotor(12.0, 0.97, 100.0, 1.4, 11000.0)
 
+# Falcon 500
+MOTOR_FALCON_500 = DcBrushedMotor(12.0, 4.69, 257.0, 1.5, 6380.0)
+
 
 def gearbox(motor, num_motors):
     """Returns a DcBrushedMotor with the same characteristics as the specified
