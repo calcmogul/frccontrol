@@ -10,6 +10,7 @@ if "--noninteractive" in sys.argv:
 import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
 
 
 class Elevator(fct.System):
@@ -54,6 +55,27 @@ class Elevator(fct.System):
         q_vel = 1.0
         r_pos = 0.0001
         self.design_kalman_filter([q_pos, q_vel], [r_pos])
+
+        self.ubuf = []
+        for i in range(10):
+            self.ubuf.append(np.zeros((1, 1)))
+
+        Q = np.diag(1.0 / np.square(q))
+        R = np.diag(1.0 / np.square(r))
+        delay = len(self.ubuf) * 0.005
+        self.K = self.K @ sp.linalg.expm((self.sysc.A - self.sysc.B @ self.K) * delay)
+
+    def update_controller(self, next_r):
+        u = self.K @ (self.r - self.x_hat)
+        if self.f:
+            rdot = (next_r - self.r) / self.dt
+            uff = self.Kff @ (rdot - self.f(self.r, np.zeros(self.u.shape)))
+        else:
+            uff = self.Kff @ (next_r - self.sysd.A @ self.r)
+        self.r = next_r
+        self.u = np.clip(u + uff, self.u_min, self.u_max)
+        self.ubuf.append(self.u)
+        self.u = self.ubuf.pop(0)
 
 
 def main():
