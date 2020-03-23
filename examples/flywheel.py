@@ -48,7 +48,7 @@ class Flywheel(fct.System):
         r = [12.0]
         self.design_lqr(q, r)
         # self.place_controller_poles([0.87])
-        self.design_two_state_feedforward(q, r)
+        self.design_two_state_feedforward()
 
         q_vel = 1.0
         r_vel = 0.01

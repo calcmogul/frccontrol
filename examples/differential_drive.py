@@ -74,12 +74,7 @@ class DifferentialDrive(fct.System):
         q = [q_pos, q_vel, q_pos, q_vel]
         r = [12.0, 12.0]
         self.design_lqr(q, r)
-
-        qff_pos = 0.005
-        qff_vel = 1.0
-        self.design_two_state_feedforward(
-            [qff_pos, qff_vel, qff_pos, qff_vel], [12.0, 12.0]
-        )
+        self.design_two_state_feedforward()
 
         q_pos = 0.05
         q_vel = 1.0
