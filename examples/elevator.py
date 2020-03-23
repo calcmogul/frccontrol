@@ -62,18 +62,6 @@ def main():
     elevator.export_cpp_coeffs("Elevator", "subsystems/")
     elevator.export_java_coeffs("Elevator")
 
-    try:
-        import slycot
-
-        elevator.plot_pzmaps()
-    except ImportError:  # Slycot unavailable. Can't show pzmaps.
-        pass
-    if "--noninteractive" in sys.argv:
-        names = ["open-loop", "closed-loop", "observer"]
-        for i in range(3):
-            plt.figure(i + 1)
-            plt.savefig(f"elevator_pzmap_{names[i]}.svg")
-
     # Set up graphing
     l0 = 0.1
     l1 = l0 + 5.0

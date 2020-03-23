@@ -91,18 +91,6 @@ def main():
     diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/")
     diff_drive.export_java_coeffs("DifferentialDrive")
 
-    try:
-        import slycot
-
-        diff_drive.plot_pzmaps()
-    except ImportError:  # Slycot unavailable. Can't show pzmaps.
-        pass
-    if "--noninteractive" in sys.argv:
-        names = ["open-loop", "closed-loop", "observer"]
-        for i in range(3):
-            plt.figure(i + 1)
-            plt.savefig(f"differential_drive_pzmap_{names[i]}.svg")
-
     t, xprof, vprof, aprof = fct.generate_s_curve_profile(
         max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
     )

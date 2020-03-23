@@ -62,13 +62,6 @@ def main():
     flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
     flywheel.export_java_coeffs("Flywheel")
 
-    flywheel.plot_pzmaps()
-    if "--noninteractive" in sys.argv:
-        names = ["open-loop", "closed-loop", "observer"]
-        for i in range(3):
-            plt.figure(i + 1)
-            plt.savefig(f"flywheel_pzmap_{names[i]}.svg")
-
     # Set up graphing
     l0 = 0.1
     l1 = l0 + 5.0

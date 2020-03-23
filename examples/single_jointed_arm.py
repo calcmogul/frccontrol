@@ -66,18 +66,6 @@ def main():
     single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "subsystems/")
     single_jointed_arm.export_java_coeffs("SingleJointedArm")
 
-    try:
-        import slycot
-
-        single_jointed_arm.plot_pzmaps()
-    except ImportError:  # Slycot unavailable. Can't show pzmaps.
-        pass
-    if "--noninteractive" in sys.argv:
-        names = ["open-loop", "closed-loop", "observer"]
-        for i in range(3):
-            plt.figure(i + 1)
-            plt.savefig(f"single_jointed_arm_pzmap_{names[i]}.svg")
-
     t, xprof, vprof, aprof = fct.generate_s_curve_profile(
         max_v=0.5, max_a=1, time_to_max_a=0.5, dt=dt, goal=1.04
     )
