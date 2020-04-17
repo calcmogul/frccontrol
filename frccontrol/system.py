@@ -316,7 +316,7 @@ class System:
 
         return x_rec, ref_rec, u_rec, y_rec
 
-    def plot_time_responses(self, t, x_rec, ref_rec, u_rec):
+    def plot_time_responses(self, t, x_rec, ref_rec, u_rec, title=__default):
         """Plots time-domain responses of the system and the control inputs.
 
         Keyword arguments:
@@ -324,6 +324,7 @@ class System:
         x_rec -- recording of state estimates from generate_time_responses()
         ref_rec -- recording of references from generate_time_responses()
         u_rec -- recording of inputs from generate_time_responses()
+        title -- title for time-domain plots (default: "Time-domain responses")
         """
         plt.figure()
         subplot_max = self.sysd.states + self.sysd.inputs
@@ -339,7 +340,10 @@ class System:
             else:
                 plt.ylabel(self.state_labels[i])
             if i == 0:
-                plt.title("Time-domain responses")
+                if title == self.__default:
+                    plt.title("Time-domain responses")
+                else:
+                    plt.title(title)
             plt.plot(t, self.extract_row(x_rec, i), label="Estimated state")
             plt.plot(t, self.extract_row(ref_rec, i), label="Reference")
             plt.legend()
