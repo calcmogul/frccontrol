@@ -320,7 +320,7 @@ class System:
         """Plots time-domain responses of the system and the control inputs.
 
         Keyword arguments:
-        time -- list of timesteps corresponding to references.
+        time -- list of timesteps corresponding to references
         x_rec -- recording of state estimates from generate_time_responses()
         ref_rec -- recording of references from generate_time_responses()
         u_rec -- recording of inputs from generate_time_responses()
