@@ -91,8 +91,8 @@ def main():
     diff_drive.export_cpp_coeffs("DifferentialDrive", "subsystems/")
     diff_drive.export_java_coeffs("DifferentialDrive")
 
-    t, xprof, vprof, aprof = fct.generate_s_curve_profile(
-        max_v=4.0, max_a=3.5, time_to_max_a=1.0, dt=dt, goal=50.0
+    t, xprof, vprof, aprof = fct.generate_trapezoid_profile(
+        max_v=3.5, time_to_max_v=1.0, dt=dt, goal=50.0
     )
 
     # Generate references for simulation
