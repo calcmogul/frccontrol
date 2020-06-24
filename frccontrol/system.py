@@ -2,7 +2,7 @@
 designing controllers for them.
 """
 
-import abc
+from abc import abstractmethod, ABCMeta
 import control as ct
 import frccontrol as fct
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ import scipy as sp
 
 
 class System:
-    __metaclass__ = abc.ABCMeta
+    __metaclass__ = ABCMeta
 
     def __init__(self, u_min, u_max, dt, states, inputs, nonlinear_func=None):
         """Sets up the matrices for a state-space model.
@@ -131,7 +131,7 @@ class System:
                 uff = self.Kff @ (self.r - self.sysd.A @ self.r)
         self.u = np.clip(u + uff, self.u_min, self.u_max)
 
-    @abc.abstractmethod
+    @abstractmethod
     def create_model(self, states=__default, inputs=__default):
         """Relinearize model around given state.
 
@@ -144,7 +144,7 @@ class System:
         """
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def design_controller_observer(self):
         pass
 
