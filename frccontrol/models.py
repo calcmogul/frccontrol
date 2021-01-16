@@ -74,8 +74,8 @@ def gearbox(motor, num_motors):
     return DcBrushedMotor(
         motor.nominal_voltage,
         motor.stall_torque * num_motors,
-        motor.stall_current,
-        motor.free_current,
+        motor.stall_current * num_motors,
+        motor.free_current * num_motors,
         motor.free_speed / (2.0 * np.pi) * 60,
     )
 
