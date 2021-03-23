@@ -25,8 +25,8 @@ def kalmd(sys, Q, R):
 
     # Compute the steady state covariance matrix
     P_prior = sp.linalg.solve_discrete_are(a=sys.A.T, b=sys.C.T, q=Q, r=R)
-    S = sys.C * P_prior * sys.C.T + R
-    K = P_prior * sys.C.T * np.linalg.inv(S)
-    P = (np.eye(m) - K * sys.C) * P_prior
+    S = sys.C @ P_prior @ sys.C.T + R
+    K = P_prior @ sys.C.T @ np.linalg.inv(S)
+    P = (np.eye(m) - K @ sys.C) @ P_prior
 
     return K, P
