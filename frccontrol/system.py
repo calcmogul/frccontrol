@@ -31,7 +31,6 @@ class System:
         self.sysd = self.sysc.sample(self.dt)  # Discretize model
 
         # Model matrices
-        self.x = np.zeros((self.sysc.A.shape[0], 1))
         self.x = np.asarray(states)
         self.u = np.asarray(inputs)
         self.y = np.zeros((self.sysc.C.shape[0], 1))
@@ -40,7 +39,6 @@ class System:
         self.r = np.zeros((self.sysc.A.shape[0], 1))
 
         # Observer matrices
-        self.x_hat = np.zeros((self.sysc.A.shape[0], 1))
         self.x_hat = np.asarray(states)
 
         self.u_min = np.asarray(u_min)
@@ -282,7 +280,7 @@ class System:
         Returns:
         Desired list of data from buf
         """
-        return np.squeeze(np.asarray(buf[idx, :]))
+        return np.squeeze(buf[idx : idx + 1, :])
 
     def generate_time_responses(self, t, refs):
         """Generate time-domain responses of the system and the control inputs.
