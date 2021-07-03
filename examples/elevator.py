@@ -57,7 +57,7 @@ class Elevator(fct.System):
 
 
 def main():
-    dt = 0.00505
+    dt = 0.005
     elevator = Elevator(dt)
     elevator.export_cpp_coeffs("Elevator", "subsystems/")
     elevator.export_java_coeffs("Elevator")

@@ -57,7 +57,7 @@ class Flywheel(fct.System):
 
 
 def main():
-    dt = 0.00505
+    dt = 0.005
     flywheel = Flywheel(dt)
     flywheel.export_cpp_coeffs("Flywheel", "subsystems/")
     flywheel.export_java_coeffs("Flywheel")
