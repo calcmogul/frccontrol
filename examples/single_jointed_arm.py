@@ -66,8 +66,8 @@ def main():
     single_jointed_arm.export_cpp_coeffs("SingleJointedArm", "subsystems/")
     single_jointed_arm.export_java_coeffs("SingleJointedArm")
 
-    t, xprof, vprof, aprof = fct.generate_s_curve_profile(
-        max_v=0.5, max_a=1, time_to_max_a=0.5, dt=dt, goal=1.04
+    t, xprof, vprof, aprof = fct.generate_trapezoid_profile(
+        max_v=0.5, time_to_max_v=0.5, dt=dt, goal=1.04
     )
 
     # Generate references for simulation
