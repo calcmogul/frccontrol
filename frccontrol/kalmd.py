@@ -4,7 +4,7 @@ import scipy as sp
 
 
 def kalmd(sys, Q, R):
-    """Solves for the steady state kalman gain and error covariance matrices.
+    """Solves for the steady-state kalman gain and error covariance matrices.
 
     Keyword arguments:
     sys -- discrete state-space model
@@ -12,21 +12,11 @@ def kalmd(sys, Q, R):
     R -- measurement noise covariance matrix
 
     Returns:
-    Kalman gain, error covariance matrix.
+    K -- numpy.array(states x outputs), Kalman gain matrix.
     """
-    m = sys.A.shape[0]
+    if np.linalg.matrix_rank(ct.obsv(sys.A, sys.C)) < sys.A.shape[0]:
+        print(f"Warning: The system is unobservable\n\nA = {sys.A}\nC = {sys.C}\n")
 
-    observability_rank = np.linalg.matrix_rank(ct.obsv(sys.A, sys.C))
-    if observability_rank != m:
-        print(
-            "Warning: Observability of %d != %d, unobservable state"
-            % (observability_rank, m)
-        )
-
-    # Compute the steady state covariance matrix
-    P_prior = sp.linalg.solve_discrete_are(a=sys.A.T, b=sys.C.T, q=Q, r=R)
-    S = sys.C @ P_prior @ sys.C.T + R
-    K = P_prior @ sys.C.T @ np.linalg.inv(S)
-    P = (np.eye(m) - K @ sys.C) @ P_prior
-
-    return K, P
+    P = sp.linalg.solve_discrete_are(a=sys.A.T, b=sys.C.T, q=Q, r=R)
+    S = sys.C @ P @ sys.C.T + R
+    return np.linalg.solve(S.T, sys.C @ P.T).T

@@ -33,14 +33,8 @@ def lqr(*args, **kwargs):
     else:
         N = np.zeros((sys.A.shape[0], sys.B.shape[1]))
 
-    m = sys.A.shape[0]
-
-    controllability_rank = np.linalg.matrix_rank(ct.ctrb(sys.A, sys.B))
-    if controllability_rank != m:
-        print(
-            "Warning: Controllability of %d != %d, uncontrollable state"
-            % (controllability_rank, m)
-        )
+    if np.linalg.matrix_rank(ct.ctrb(sys.A, sys.B)) < sys.A.shape[0]:
+        print(f"Warning: The system is uncontrollable\n\nA = {sys.A}\nB = {sys.B}\n")
 
     if sys.dt == None:
         P = sp.linalg.solve_continuous_are(a=sys.A, b=sys.B, q=Q, r=R, s=N)

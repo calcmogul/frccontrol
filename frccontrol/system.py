@@ -188,7 +188,7 @@ class System:
         if not self.f:
             from . import kalmd
 
-            self.kalman_gain, self.P_steady = kalmd(self.sysd, Q=self.Q, R=self.R)
+            self.kalman_gain = kalmd(self.sysd, Q=self.Q, R=self.R)
         else:
             m = self.sysd.A.shape[0]
             M = np.concatenate(
