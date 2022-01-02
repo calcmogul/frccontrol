@@ -4,7 +4,7 @@ import scipy as sp
 
 
 def kalmd(sys, Q, R):
-    """Solves for the steady-state kalman gain and error covariance matrices.
+    """Solves for the steady-state kalman gain matrix.
 
     Keyword arguments:
     sys -- discrete state-space model
