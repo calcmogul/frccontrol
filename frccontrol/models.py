@@ -129,7 +129,7 @@ def flywheel(motor, num_motors, J, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.array([[-(G ** 2) * motor.Kt / (motor.Kv * motor.R * J)]])
+    A = np.array([[-(G**2) * motor.Kt / (motor.Kv * motor.R * J)]])
     B = np.array([[G * motor.Kt / (motor.R * J)]])
     C = np.array([[1]])
     D = np.array([[0]])
@@ -160,9 +160,9 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
     """
     motor = gearbox(motor, num_motors)
 
-    C1 = -(Gl ** 2) * motor.Kt / (motor.Kv * motor.R * r ** 2)
+    C1 = -(Gl**2) * motor.Kt / (motor.Kv * motor.R * r**2)
     C2 = Gl * motor.Kt / (motor.R * r)
-    C3 = -(Gr ** 2) * motor.Kt / (motor.Kv * motor.R * r ** 2)
+    C3 = -(Gr**2) * motor.Kt / (motor.Kv * motor.R * r**2)
     C4 = Gr * motor.Kt / (motor.R * r)
     # fmt: off
     A = np.array([[0, 1, 0, 0],
@@ -200,7 +200,7 @@ def single_jointed_arm(motor, num_motors, J, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.array([[0, 1], [0, -(G ** 2) * motor.Kt / (motor.Kv * motor.R * J)]])
+    A = np.array([[0, 1], [0, -(G**2) * motor.Kt / (motor.Kv * motor.R * J)]])
     B = np.array([[0], [G * motor.Kt / (motor.R * J)]])
     C = np.array([[1, 0]])
     D = np.array([[0]])

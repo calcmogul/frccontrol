@@ -41,7 +41,7 @@ class SingleJointedArm(fct.System):
         # Length of arm in m
         l = 1.2192
         # Arm moment of inertia in kg-m^2
-        J = 1 / 3 * m * l ** 2
+        J = 1 / 3 * m * l**2
         # Gear ratio
         G = 1.0 / 2.0
 

@@ -84,7 +84,7 @@ def generate_s_curve_profile(max_v, max_a, time_to_max_a, dt, goal):
 
     if short_profile:
         profile_max_v = max_a * (
-            math.sqrt(goal / max_a - 0.75 * time_to_max_a ** 2) - 0.5 * time_to_max_a
+            math.sqrt(goal / max_a - 0.75 * time_to_max_a**2) - 0.5 * time_to_max_a
         )
     else:
         profile_max_v = max_v
@@ -107,7 +107,7 @@ def generate_s_curve_profile(max_v, max_a, time_to_max_a, dt, goal):
         if t < time_to_max_a:
             # Ramp up acceleration
             a_rec.append(j * t)
-            v_rec.append(0.5 * j * t ** 2)
+            v_rec.append(0.5 * j * t**2)
         elif t < t2:
             # Increase speed at max acceleration
             a_rec.append(max_a)
