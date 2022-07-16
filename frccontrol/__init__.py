@@ -2,6 +2,7 @@
 
 from frccontrol import models
 from frccontrol.ctrlutil import *
+from frccontrol.discretization import *
 from frccontrol.kalmd import *
 from frccontrol.lqr import *
 from frccontrol.numerical_jacobian import *

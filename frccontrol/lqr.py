@@ -1,4 +1,4 @@
-import control as ct
+import frccontrol as fct
 import numpy as np
 import scipy as sp
 
@@ -33,7 +33,7 @@ def lqr(*args, **kwargs):
     else:
         N = np.zeros((sys.A.shape[0], sys.B.shape[1]))
 
-    if np.linalg.matrix_rank(ct.ctrb(sys.A, sys.B)) < sys.A.shape[0]:
+    if np.linalg.matrix_rank(fct.ctrb(sys.A, sys.B)) < sys.A.shape[0]:
         print(f"Warning: The system is uncontrollable\n\nA = {sys.A}\nB = {sys.B}\n")
 
     if sys.dt == None:

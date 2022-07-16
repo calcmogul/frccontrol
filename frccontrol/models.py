@@ -1,5 +1,5 @@
-import control as ct
 import numpy as np
+from scipy.signal import StateSpace
 
 
 class DcBrushedMotor:
@@ -108,7 +108,7 @@ def elevator(motor, num_motors, m, r, G):
     D = np.array([[0]])
     # fmt: on
 
-    return ct.ss(A, B, C, D)
+    return StateSpace(A, B, C, D)
 
 
 def flywheel(motor, num_motors, J, G):
@@ -134,7 +134,7 @@ def flywheel(motor, num_motors, J, G):
     C = np.array([[1]])
     D = np.array([[0]])
 
-    return ct.ss(A, B, C, D)
+    return StateSpace(A, B, C, D)
 
 
 def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
@@ -179,7 +179,7 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
                   [0, 0]])
     # fmt: on
 
-    return ct.ss(A, B, C, D)
+    return StateSpace(A, B, C, D)
 
 
 def single_jointed_arm(motor, num_motors, J, G):
@@ -205,4 +205,4 @@ def single_jointed_arm(motor, num_motors, J, G):
     C = np.array([[1, 0]])
     D = np.array([[0]])
 
-    return ct.ss(A, B, C, D)
+    return StateSpace(A, B, C, D)

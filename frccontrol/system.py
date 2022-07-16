@@ -3,8 +3,6 @@ designing controllers for them.
 """
 
 from abc import abstractmethod, ABCMeta
-import control as ct
-import frccontrol as fct
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
@@ -28,7 +26,7 @@ class System:
         self.f = nonlinear_func
         self.sysc = self.create_model(np.asarray(states), np.asarray(inputs))
         self.dt = dt
-        self.sysd = self.sysc.sample(self.dt)  # Discretize model
+        self.sysd = self.sysc.to_discrete(self.dt)  # Discretize model
 
         # Model matrices
         self.x = np.asarray(states)
@@ -172,7 +170,7 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        self.K = ct.place(self.sysd.A, self.sysd.B, poles)
+        self.K = sp.signal.place_poles(self.sysd.A, self.sysd.B, poles).gain_matrix
 
     def design_kalman_filter(self, Q_elems, R_elems):
         """Design a discrete time Kalman filter for the system.
@@ -213,7 +211,7 @@ class System:
         poles -- a list of compex numbers which are the desired pole locations.
                  Complex conjugate poles must be in pairs.
         """
-        L = ct.place(self.sysd.A.T, self.sysd.C.T, poles).T
+        L = sp.signal.place_poles(self.sysd.A.T, self.sysd.C.T, poles).gain_matrix.T
         self.kalman_gain = np.linalg.inv(self.sysd.A) @ L
 
     def design_two_state_feedforward(self, Q_elems=None, R_elems=None):
@@ -257,19 +255,6 @@ class System:
             else:
                 self.Kff = np.linalg.pinv(self.sysd.B)
 
-    def plot_pzmaps(self, discrete=True):
-        """Plots pole-zero maps of open-loop system, closed-loop system, and
-        observer poles.
-
-        Keyword arguments:
-        discrete -- whether to make pole-zero map of continuous or discrete
-                    version of system
-        """
-        fct.plot_open_loop_poles(self, discrete)
-        fct.plot_closed_loop_poles(self, discrete)
-        fct.plot_observer_poles(self, discrete)
-        plt.tight_layout()
-
     def extract_row(self, buf, idx):
         """Extract row from 2D array.
 
@@ -295,10 +280,10 @@ class System:
         t -- list of timesteps corresponding to references
         refs -- list of reference vectors, one for each time
         """
-        x_rec = np.zeros((self.sysd.states, 0))
-        ref_rec = np.zeros((self.sysd.states, 0))
-        u_rec = np.zeros((self.sysd.inputs, 0))
-        y_rec = np.zeros((self.sysd.outputs, 0))
+        x_rec = np.zeros((self.sysd.A.shape[0], 0))
+        ref_rec = np.zeros((self.sysd.A.shape[0], 0))
+        u_rec = np.zeros((self.sysd.B.shape[1], 0))
+        y_rec = np.zeros((self.sysd.C.shape[0], 0))
 
         # Run simulation
         self.r = refs[0]
@@ -325,10 +310,12 @@ class System:
         title -- title for time-domain plots (default: "Time-domain responses")
         """
         plt.figure()
-        subplot_max = self.sysd.states + self.sysd.inputs
-        for i in range(self.sysd.states):
+        nstates = self.sysd.A.shape[0]
+        ninputs = self.sysd.B.shape[1]
+        subplot_max = nstates + ninputs
+        for i in range(nstates):
             plt.subplot(subplot_max, 1, i + 1)
-            if self.sysd.states + self.sysd.inputs > 3:
+            if nstates + ninputs > 3:
                 plt.ylabel(
                     self.state_labels[i],
                     horizontalalignment="right",
@@ -346,9 +333,9 @@ class System:
             plt.plot(t, self.extract_row(ref_rec, i), label="Reference")
             plt.legend()
 
-        for i in range(self.sysd.inputs):
-            plt.subplot(subplot_max, 1, self.sysd.states + i + 1)
-            if self.sysd.states + self.sysd.inputs > 3:
+        for i in range(ninputs):
+            plt.subplot(subplot_max, 1, nstates + i + 1)
+            if nstates + ninputs > 3:
                 plt.ylabel(
                     self.u_labels[i],
                     horizontalalignment="right",

@@ -69,7 +69,7 @@ setup(
     zip_safe=True,
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    install_requires=["control"],
+    install_requires=["scipy", "numpy"],
     license="BSD License",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
