@@ -25,17 +25,3 @@ def obsv(A, C):
     return np.vstack(
         [C] + [C @ np.linalg.matrix_power(A, i) for i in range(1, A.shape[0])]
     )
-
-
-def conv(polynomial, *args):
-    """Implementation of MATLAB's conv() function.
-
-    Keyword arguments:
-    polynomial -- list of coefficients of first polynomial
-
-    Arguments:
-    *args -- more lists of polynomial coefficients
-    """
-    for arg in args:
-        polynomial = np.convolve(polynomial, arg).tolist()
-    return polynomial
