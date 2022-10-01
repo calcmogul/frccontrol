@@ -1,3 +1,5 @@
+"""Functions for generating 1D motion profiles."""
+
 import math
 
 

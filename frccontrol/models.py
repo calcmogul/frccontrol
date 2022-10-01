@@ -1,8 +1,12 @@
+"""DC motor class instances for common FRC motors."""
+
 import numpy as np
 from scipy.signal import StateSpace
 
 
 class DcBrushedMotor:
+    """Models a DC brushed motor."""
+
     def __init__(
         self, nominal_voltage, stall_torque, stall_current, free_current, free_speed
     ):

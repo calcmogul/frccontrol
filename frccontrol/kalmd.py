@@ -1,6 +1,9 @@
-import frccontrol as fct
+"""Function for computing the steady-state Kalman gain matrix."""
+
 import numpy as np
 import scipy as sp
+
+from frccontrol import obsv
 
 
 def kalmd(sys, Q, R):
@@ -14,7 +17,7 @@ def kalmd(sys, Q, R):
     Returns:
     K -- numpy.array(states x outputs), Kalman gain matrix.
     """
-    if np.linalg.matrix_rank(fct.obsv(sys.A, sys.C)) < sys.A.shape[0]:
+    if np.linalg.matrix_rank(obsv(sys.A, sys.C)) < sys.A.shape[0]:
         print(f"Warning: The system is unobservable\n\nA = {sys.A}\nC = {sys.C}\n")
 
     P = sp.linalg.solve_discrete_are(a=sys.A.T, b=sys.C.T, q=Q, r=R)

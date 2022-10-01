@@ -1,9 +1,12 @@
-import frccontrol as fct
+"""Function for computing the infinite horizon LQR."""
+
 import numpy as np
 import scipy as sp
 
+from frccontrol import ctrb
 
-def lqr(*args, **kwargs):
+
+def lqr(*args):
     """Solves for the optimal linear-quadratic regulator (LQR).
 
     For a continuous system:
@@ -33,10 +36,10 @@ def lqr(*args, **kwargs):
     else:
         N = np.zeros((sys.A.shape[0], sys.B.shape[1]))
 
-    if np.linalg.matrix_rank(fct.ctrb(sys.A, sys.B)) < sys.A.shape[0]:
+    if np.linalg.matrix_rank(ctrb(sys.A, sys.B)) < sys.A.shape[0]:
         print(f"Warning: The system is uncontrollable\n\nA = {sys.A}\nB = {sys.B}\n")
 
-    if sys.dt == None:
+    if sys.dt is None:
         P = sp.linalg.solve_continuous_are(a=sys.A, b=sys.B, q=Q, r=R, s=N)
         return np.linalg.solve(R, sys.B.T @ P + N.T)
     else:

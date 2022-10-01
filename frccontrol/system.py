@@ -1,4 +1,5 @@
-"""A class that simplifies creating and updating state-space models as well as
+"""
+A class that simplifies creating and updating state-space models as well as
 designing controllers for them.
 """
 
@@ -7,8 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
+from frccontrol import kalmd, lqr, runge_kutta
+
 
 class System:
+    """Base class for frccontrol systems."""
     __metaclass__ = ABCMeta
 
     def __init__(self, u_min, u_max, dt, states, inputs, nonlinear_func=None):
@@ -68,8 +72,6 @@ class System:
     def update_plant(self):
         """Advance the model by one timestep."""
         if self.f:
-            from . import runge_kutta
-
             self.x = runge_kutta(self.f, self.x, self.u, self.dt)
         else:
             self.x = self.sysd.A @ self.x + self.sysd.B @ self.u
@@ -81,8 +83,6 @@ class System:
         In one update step, this should be run after correct_observer().
         """
         if self.f:
-            from . import runge_kutta
-
             self.x_hat = runge_kutta(self.f, self.x, self.u, self.dt)
             self.P = self.sysd.A @ self.P @ self.sysd.A.T + self.Q
         else:
@@ -142,7 +142,7 @@ class System:
 
     @abstractmethod
     def design_controller_observer(self):
-        pass
+        """Design a controller and observer."""
 
     def design_lqr(self, Q_elems, R_elems):
         """Design a discrete time linear-quadratic regulator for the system.
@@ -153,8 +153,6 @@ class System:
         R_elems -- a vector of the maximum allowed excursions of the control
                    inputs from no actuation.
         """
-        from . import lqr
-
         Q = self.__make_cost_matrix(Q_elems)
         R = self.__make_cost_matrix(R_elems)
         self.K = lqr(self.sysd, Q, R)
@@ -181,11 +179,10 @@ class System:
         R_elems -- a vector of the standard deviations of each output
                    measurement.
         """
+        # pragma pylint: disable=attribute-defined-outside-init
         self.Q = self.__make_cov_matrix(Q_elems)
         self.R = self.__make_cov_matrix(R_elems)
         if not self.f:
-            from . import kalmd
-
             self.kalman_gain = kalmd(self.sysd, Q=self.Q, R=self.R)
         else:
             m = self.sysd.A.shape[0]
@@ -267,7 +264,7 @@ class System:
         """
         return np.squeeze(buf[idx : idx + 1, :])
 
-    def generate_time_responses(self, t, refs):
+    def generate_time_responses(self, refs):
         """Generate time-domain responses of the system and the control inputs.
 
         Returns:
@@ -277,7 +274,6 @@ class System:
         y_rec -- recording of outputs
 
         Keyword arguments:
-        t -- list of timesteps corresponding to references
         refs -- list of reference vectors, one for each time
         """
         x_rec = np.zeros((self.sysd.A.shape[0], 0))
@@ -287,8 +283,8 @@ class System:
 
         # Run simulation
         self.r = refs[0]
-        for i in range(len(refs)):
-            next_r = refs[i]
+        for ref in refs:
+            next_r = ref
             self.update(next_r)
 
             # Log states for plotting
@@ -355,6 +351,7 @@ class System:
         state_labels -- list of tuples containing name of state and the unit.
         u_labels -- list of tuples containing name of input and the unit.
         """
+        # pragma pylint: disable=attribute-defined-outside-init
         self.state_labels = [x[0] + " (" + x[1] + ")" for x in state_labels]
         self.u_labels = [x[0] + " (" + x[1] + ")" for x in u_labels]
 

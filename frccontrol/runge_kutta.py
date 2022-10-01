@@ -1,3 +1,6 @@
+"""Function for integrating nonlinear system dynamics."""
+
+
 def runge_kutta(f, x, u, dt):
     """Fourth order Runge-Kutta integration.
 

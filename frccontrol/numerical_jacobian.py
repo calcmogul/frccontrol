@@ -1,3 +1,5 @@
+"""Functions for computing the numerical Jacobian of nonlinear functions."""
+
 import numpy as np
 
 
