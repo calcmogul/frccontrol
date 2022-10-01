@@ -1,9 +1,13 @@
+"""Tests the numerical_jacobian module."""
+
 import numpy as np
 
-from frccontrol.numerical_jacobian import *
+from frccontrol.numerical_jacobian import numerical_jacobian_x, numerical_jacobian_u
 
 
 def test_numerical_jacobian():
+    """Tests numerical_jacobian_x and numerical_jacobian_u."""
+
     A = np.array([[1, 2, 4, 1], [5, 2, 3, 4], [5, 1, 3, 2], [1, 1, 3, 7]])
     B = np.array([[1, 1], [2, 1], [3, 2], [3, 7]])
 
