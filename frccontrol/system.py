@@ -13,6 +13,7 @@ from frccontrol import kalmd, lqr, runge_kutta
 
 class System:
     """Base class for frccontrol systems."""
+
     __metaclass__ = ABCMeta
 
     def __init__(self, u_min, u_max, dt, states, inputs, nonlinear_func=None):
