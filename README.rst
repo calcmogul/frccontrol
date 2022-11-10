@@ -1,14 +1,16 @@
 frccontrol
 ##########
 
-Provides wrappers around Python Control for making development of state-space
-models for the FIRST Robotics Competition easier.
+Provides SciPy wrappers for easing development of state-space models for
+the FIRST Robotics Competition.
 
 Dependencies
 ************
 
 - `Python 3.5 or newer <https://www.python.org/downloads/>`_
-- Python Control
+- Matplotlib
+- NumPy
+- SciPy
 
 Installation
 ************
