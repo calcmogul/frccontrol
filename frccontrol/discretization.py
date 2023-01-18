@@ -19,6 +19,6 @@ def discretize_ab(A, B, T):
     inputs = B.shape[1]
 
     M = expm(
-        np.block([[A, B], [np.zeros((inputs, states)), np.zeros((inputs, states))]]) * T
+        np.block([[A, B], [np.zeros((inputs, states)), np.zeros((inputs, inputs))]]) * T
     )
     return M[:states, :states], M[:states, states:]
