@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
-from frccontrol import kalmd, lqr, runge_kutta
+from frccontrol import kalmd, lqr, numerical_jacobian_x, runge_kutta
 
 
 class System:
@@ -66,9 +66,9 @@ class System:
         next_r -- next controller reference (default: current reference)
         """
         self.update_plant()
+        self.predict_observer()
         self.correct_observer()
         self.update_controller(next_r)
-        self.predict_observer()
 
     def update_plant(self):
         """Advance the model by one timestep."""
@@ -84,8 +84,11 @@ class System:
         In one update step, this should be run after correct_observer().
         """
         if self.f:
-            self.x_hat = runge_kutta(self.f, self.x, self.u, self.dt)
-            self.P = self.sysd.A @ self.P @ self.sysd.A.T + self.Q
+            self.x_hat = runge_kutta(self.f, self.x_hat, self.u, self.dt)
+            A = sp.linalg.expm(numerical_jacobian_x(
+                self.x_hat.shape[0], self.x_hat.shape[0], self.f, self.x_hat, self.u
+            ))
+            self.P = A @ self.P @ A.T + self.Q
         else:
             self.x_hat = self.sysd.A @ self.x_hat + self.sysd.B @ self.u
 
