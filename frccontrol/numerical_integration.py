@@ -1,7 +1,7 @@
-"""Function for integrating nonlinear system dynamics."""
+"""Functions for integrating nonlinear system dynamics."""
 
 
-def runge_kutta(f, x, u, dt):
+def rk4(f, x, u, dt):
     """Fourth order Runge-Kutta integration.
 
     Keyword arguments:
