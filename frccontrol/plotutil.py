@@ -26,8 +26,7 @@ def generate_time_responses(system, refs):
     y_rec = np.zeros((system.y.shape[0], 0))
 
     # Run simulation
-    for i in range(len(refs)):
-        r = refs[i]
+    for i, r in enumerate(refs):
         if i < len(refs) - 1:
             next_r = refs[i + 1]
         else:
