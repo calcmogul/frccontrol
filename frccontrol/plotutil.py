@@ -15,7 +15,8 @@ def generate_time_responses(system, refs):
     refs -- list of reference vectors, one for each time
 
     Returns:
-    x_rec -- recording of state estimates
+    x_rec -- If system.observer exists, a recording of the state estimates.
+             Otherwise, a recording of the true states.
     ref_rec -- recording of references
     u_rec -- recording of inputs
     y_rec -- recording of outputs
@@ -34,7 +35,10 @@ def generate_time_responses(system, refs):
         system.update(r, next_r)
 
         # Log states for plotting
-        x_rec = np.concatenate((x_rec, system.observer.x_hat), axis=1)
+        if hasattr(system, "observer"):
+            x_rec = np.concatenate((x_rec, system.observer.x_hat), axis=1)
+        else:
+            x_rec = np.concatenate((x_rec, system.x), axis=1)
         ref_rec = np.concatenate((ref_rec, r), axis=1)
         u_rec = np.concatenate((u_rec, system.u), axis=1)
         y_rec = np.concatenate((y_rec, system.y), axis=1)
