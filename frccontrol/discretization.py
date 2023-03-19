@@ -4,6 +4,20 @@ import numpy as np
 from scipy.linalg import expm
 
 
+def discretize_a(A, dt):
+    """Discretizes the given continuous A matrix.
+
+    Keyword arguments:
+    A -- continuous system matrix
+    dt -- discretization timestep
+
+    Returns:
+    discrete system matrix
+    """
+    # ϕ = eᴬᵀ
+    return expm(A * dt)
+
+
 def discretize_ab(A, B, dt):
     """Discretizes the given continuous A and B matrices.
 
