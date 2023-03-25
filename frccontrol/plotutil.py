@@ -84,7 +84,7 @@ def plot_time_responses(
             plt.ylabel(state_labels[i])
         if i == 0 and title is not None:
             plt.title(title)
-        plt.plot(t_rec, x_rec[i, :], label="Estimated state")
+        plt.plot(t_rec, x_rec[i, :], label="State")
         plt.plot(t_rec, ref_rec[i, :], label="Reference")
         plt.legend()
 
