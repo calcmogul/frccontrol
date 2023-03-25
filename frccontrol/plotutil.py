@@ -17,12 +17,12 @@ def generate_time_responses(system, refs):
     Returns:
     x_rec -- If system.observer exists, a recording of the state estimates.
              Otherwise, a recording of the true states.
-    ref_rec -- recording of references
+    r_rec -- recording of references
     u_rec -- recording of inputs
     y_rec -- recording of outputs
     """
     x_rec = np.zeros((system.x.shape[0], 0))
-    ref_rec = np.zeros((system.x.shape[0], 0))
+    r_rec = np.zeros((system.x.shape[0], 0))
     u_rec = np.zeros((system.u.shape[0], 0))
     y_rec = np.zeros((system.y.shape[0], 0))
 
@@ -39,11 +39,11 @@ def generate_time_responses(system, refs):
             x_rec = np.concatenate((x_rec, system.observer.x_hat), axis=1)
         else:
             x_rec = np.concatenate((x_rec, system.x), axis=1)
-        ref_rec = np.concatenate((ref_rec, r), axis=1)
+        r_rec = np.concatenate((r_rec, r), axis=1)
         u_rec = np.concatenate((u_rec, system.u), axis=1)
         y_rec = np.concatenate((y_rec, system.y), axis=1)
 
-    return x_rec, ref_rec, u_rec, y_rec
+    return x_rec, r_rec, u_rec, y_rec
 
 
 def plot_time_responses(
@@ -51,7 +51,7 @@ def plot_time_responses(
     input_labels,
     t_rec,
     x_rec,
-    ref_rec,
+    r_rec,
     u_rec,
     title="Time-domain responses",
 ):
@@ -62,7 +62,7 @@ def plot_time_responses(
     input_labels -- list of input label strings
     t_rec -- list of timesteps corresponding to references
     x_rec -- recording of state estimates from generate_time_responses()
-    ref_rec -- recording of references from generate_time_responses()
+    r_rec -- recording of references from generate_time_responses()
     u_rec -- recording of inputs from generate_time_responses()
     title -- title for time-domain plots (default: "Time-domain responses")
     """
@@ -85,7 +85,7 @@ def plot_time_responses(
         if i == 0 and title is not None:
             plt.title(title)
         plt.plot(t_rec, x_rec[i, :], label="State")
-        plt.plot(t_rec, ref_rec[i, :], label="Reference")
+        plt.plot(t_rec, r_rec[i, :], label="Reference")
         plt.legend()
 
     for i in range(inputs):
