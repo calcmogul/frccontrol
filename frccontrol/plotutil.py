@@ -99,6 +99,6 @@ def plot_time_responses(
             )
         else:
             plt.ylabel(input_labels[i])
-        plt.plot(t_rec, u_rec[i, :], label="Control effort")
+        plt.plot(t_rec, u_rec[i, :], label="Input")
         plt.legend()
     plt.xlabel("Time (s)")
