@@ -11,3 +11,4 @@ from .numerical_integration import *
 from .numerical_jacobian import *
 from .plotutil import *
 from .profiles import *
+from .trajectory import *
