@@ -103,14 +103,12 @@ def elevator(motor, num_motors, m, r, G):
     """
     motor = gearbox(motor, num_motors)
 
-    # fmt: off
-    A = np.array([[0, 1],
-                  [0, -G**2 * motor.Kt / (motor.R * r**2 * m * motor.Kv)]])
-    B = np.array([[0],
-                  [G * motor.Kt / (motor.R * r * m)]])
+    A = np.array(
+        [[0, 1], [0, -(G**2) * motor.Kt / (motor.R * r**2 * m * motor.Kv)]]
+    )
+    B = np.array([[0], [G * motor.Kt / (motor.R * r * m)]])
     C = np.array([[1, 0]])
     D = np.array([[0]])
-    # fmt: on
 
     return StateSpace(A, B, C, D)
 
@@ -144,10 +142,9 @@ def flywheel(motor, num_motors, J, G):
 def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
     """Returns the state-space model for a differential drive.
 
-    States: [[left position], [left velocity],
-             [right position], [right velocity]]
+    States: [[left velocity], [right velocity]]
     Inputs: [[left voltage], [right voltage]]
-    Outputs: [[left position], [right position]]
+    Outputs: [[left velocity], [right velocity]]
 
     Keyword arguments:
     motor -- instance of DcBrushedMotor
@@ -168,20 +165,20 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
     C2 = Gl * motor.Kt / (motor.R * r)
     C3 = -(Gr**2) * motor.Kt / (motor.Kv * motor.R * r**2)
     C4 = Gr * motor.Kt / (motor.R * r)
-    # fmt: off
-    A = np.array([[0, 1, 0, 0],
-                  [0, (1 / m + rb**2 / J) * C1, 0, (1 / m - rb**2 / J) * C3],
-                  [0, 0, 0, 1],
-                  [0, (1 / m - rb**2 / J) * C1, 0, (1 / m + rb**2 / J) * C3]])
-    B = np.array([[0, 0],
-                  [(1 / m + rb**2 / J) * C2, (1 / m - rb**2 / J) * C4],
-                  [0, 0],
-                  [(1 / m - rb**2 / J) * C2, (1 / m + rb**2 / J) * C4]])
-    C = np.array([[1, 0, 0, 0],
-                  [0, 0, 1, 0]])
-    D = np.array([[0, 0],
-                  [0, 0]])
-    # fmt: on
+    A = np.array(
+        [
+            [(1 / m + rb**2 / J) * C1, (1 / m - rb**2 / J) * C3],
+            [(1 / m - rb**2 / J) * C1, (1 / m + rb**2 / J) * C3],
+        ]
+    )
+    B = np.array(
+        [
+            [(1 / m + rb**2 / J) * C2, (1 / m - rb**2 / J) * C4],
+            [(1 / m - rb**2 / J) * C2, (1 / m + rb**2 / J) * C4],
+        ]
+    )
+    C = np.eye(2)
+    D = np.zeros((2, 2))
 
     return StateSpace(A, B, C, D)
 
