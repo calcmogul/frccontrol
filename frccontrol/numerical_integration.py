@@ -137,7 +137,7 @@ def rkdp(f, x, u, dt, max_error=1e-6):
                 )
             )
 
-            if truncation_error < 1e-9:
+            if truncation_error == 0.0:
                 h = dt - dt_elapsed
             else:
                 h *= 0.9 * math.pow(max_error / truncation_error, 1.0 / 5.0)
