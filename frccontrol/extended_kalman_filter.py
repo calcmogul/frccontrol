@@ -7,7 +7,7 @@ import scipy as sp
 
 from .ctrlutil import make_cov_matrix, obsv
 from .discretization import discretize_aq, discretize_r
-from .numerical_integration import rk4
+from .numerical_integration import rkdp
 from .numerical_jacobian import numerical_jacobian_x
 
 
@@ -100,7 +100,7 @@ class ExtendedKalmanFilter:
         # Find discrete A and Q
         discA, discQ = discretize_aq(contA, self.contQ, dt)
 
-        self.x_hat = rk4(self.f, self.x_hat, u, dt)
+        self.x_hat = rkdp(self.f, self.x_hat, u, dt)
 
         # Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
         self.P = discA @ self.P @ discA.T + discQ
