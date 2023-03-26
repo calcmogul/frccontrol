@@ -5,5 +5,3 @@ dist/
 __pycache__
 *.egg-info/
 version.py
-
-*Coeffs.*
