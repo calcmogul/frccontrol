@@ -18,5 +18,5 @@ if [ `echo -n $(git diff --staged) | wc -c` != 0 ]; then
 fi
 
 git pull https://github.com/calcmogul/frccontrol main || exit 1
-python setup.py sdist bdist_wheel
+python -m build
 twine upload dist/*
