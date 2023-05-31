@@ -1,0 +1,43 @@
+[project]
+name = "frccontrol"
+description = "Wrappers around Python Control for making development of state-space models for the FIRST Robotics Competition easier"
+dynamic = [ "version" ]
+readme = "README.rst"
+dependencies = [ "matplotlib", "numpy", "scipy" ]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering",
+  "Programming Language :: Python :: 3"
+]
+
+  [project.license]
+  text = "BSD-3-Clause"
+
+  [[project.authors]]
+  name = "Tyler Veness"
+  email = "calcmogul@gmail.com"
+
+  [project.urls]
+  Homepage = "https://github.com/calcmogul/frccontrol"
+
+[build-system]
+requires = [
+  "matplotlib",
+  "numpy",
+  "scipy",
+  "setuptools>=61.0",
+  "setuptools-git-versioning"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
+version_callback = "frccontrol.version:get_version"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [ "frccontrol/test" ]
