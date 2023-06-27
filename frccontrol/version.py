@@ -25,4 +25,4 @@ def get_version():
         commit_count = proc.stdout
 
     # Version number: <year>.<# commits on main>
-    return str(date.today().year) + "." + commit_count.strip()
+    return f"{date.today().year}.{commit_count.strip()}"
