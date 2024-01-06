@@ -1,6 +1,6 @@
 [project]
 name = "frccontrol"
-description = "Wrappers around Python Control for making development of state-space models for the FIRST Robotics Competition easier"
+description = "Provides SciPy wrappers for easing development of state-space models for the FIRST Robotics Competition"
 dynamic = [ "version" ]
 readme = "README.rst"
 dependencies = [ "matplotlib", "numpy", "scipy" ]
