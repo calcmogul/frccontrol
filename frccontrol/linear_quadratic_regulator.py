@@ -5,7 +5,7 @@ Linear quadratic regulator class.
 import numpy as np
 import scipy as sp
 
-from .ctrlutil import ctrb, make_cost_matrix
+from .ctrlutil import is_stabilizable, make_cost_matrix
 from .discretization import discretize_ab
 
 
@@ -30,9 +30,9 @@ class LinearQuadraticRegulator:
 
         discA, discB = discretize_ab(A, B, dt)
 
-        if np.linalg.matrix_rank(ctrb(discA, discB)) < discA.shape[0]:
-            print(
-                f"Warning: The system is uncontrollable\n\nA = {discA}\nB = {discB}\n"
+        if not is_stabilizable(discA, discB):
+            raise RuntimeError(
+                f"The system is unstabilizable!\n\nA = {discA}\nB = {discB}\n"
             )
 
         Q = make_cost_matrix(Qelems)

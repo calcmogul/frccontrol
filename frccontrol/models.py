@@ -103,9 +103,7 @@ def elevator(motor, num_motors, m, r, G):
     """
     motor = gearbox(motor, num_motors)
 
-    A = np.array(
-        [[0, 1], [0, -(G**2) * motor.Kt / (motor.R * r**2 * m * motor.Kv)]]
-    )
+    A = np.array([[0, 1], [0, -(G**2) * motor.Kt / (motor.R * r**2 * m * motor.Kv)]])
     B = np.array([[0], [G * motor.Kt / (motor.R * r * m)]])
     C = np.array([[1, 0]])
     D = np.array([[0]])

@@ -5,7 +5,7 @@ Linear Kalman filter class.
 import numpy as np
 import scipy as sp
 
-from .ctrlutil import make_cov_matrix, obsv
+from .ctrlutil import is_detectable, make_cov_matrix
 from .discretization import discretize_ab, discretize_aq, discretize_r
 
 
@@ -36,8 +36,8 @@ class KalmanFilter:
         C = plant.C
         R = discretize_r(make_cov_matrix(measurement_std_devs), dt)
 
-        if np.linalg.matrix_rank(obsv(A, C)) < A.shape[0]:
-            print(f"Warning: The system is unobservable\n\nA = {A}\nC = {C}\n")
+        if not is_detectable(A, C):
+            raise RuntimeError(f"The system is undetectable!\n\nA = {A}\nC = {C}\n")
 
         P = sp.linalg.solve_discrete_are(a=A.T, b=C.T, q=Q, r=R)
 

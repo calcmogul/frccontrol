@@ -5,7 +5,7 @@ Extended Kalman filter class.
 import numpy as np
 import scipy as sp
 
-from .ctrlutil import make_cov_matrix, obsv
+from .ctrlutil import is_detectable, make_cov_matrix
 from .discretization import discretize_aq, discretize_r
 from .numerical_integration import rkdp
 from .numerical_jacobian import numerical_jacobian_x
@@ -62,10 +62,7 @@ class ExtendedKalmanFilter:
         discA, discQ = discretize_aq(contA, self.contQ, dt)
         discR = discretize_r(self.contR, dt)
 
-        if (
-            np.linalg.matrix_rank(obsv(discA, C)) == self.states
-            and self.outputs <= self.states
-        ):
+        if is_detectable(discA, C) and self.outputs <= self.states:
             self.init_P = sp.linalg.solve_discrete_are(
                 a=discA.T, b=C.T, q=discQ, r=discR
             )

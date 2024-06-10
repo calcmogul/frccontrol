@@ -1,6 +1,7 @@
 """Control system utility functions."""
 
 import numpy as np
+import scipy as sp
 
 
 def make_cost_matrix(elems):
@@ -38,6 +39,45 @@ def make_cov_matrix(elems):
     Process noise or measurement noise covariance matrix
     """
     return np.diag(np.square(elems))
+
+
+def is_stabilizable(A, B):
+    """Returns true if (A, B) is a stabilizable pair.
+
+    (A, B) is stabilizable if and only if the uncontrollable eigenvalues of A,
+    if any, have absolute values less than one, where an eigenvalue is
+    uncontrollable if rank([λI - A, B]) < n where n is the number of states.
+
+    Keyword arguments:
+    A -- system matrix
+    B -- input matrix
+    """
+    rows = A.shape[0]
+    w, _ = sp.linalg.eig(A)
+
+    for i in range(rows):
+        if abs(w[i]) < 1:
+            continue
+
+        E = np.block([[w[i] * np.eye(rows) - A, B]])
+
+        if np.linalg.matrix_rank(E) < rows:
+            return False
+    return True
+
+
+def is_detectable(A, C):
+    """Returns true if (A, C) is a detectable pair.
+
+    (A, C) is detectable if and only if the unobservable eigenvalues of A, if
+    any, have absolute values less than one, where an eigenvalue is unobservable
+    if rank([λI - A; C]) < n where n is the number of states.
+
+    Keyword arguments:
+    A -- system matrix
+    C -- output matrix
+    """
+    return is_stabilizable(A.T, C.T)
 
 
 def ctrb(A, B):
