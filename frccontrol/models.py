@@ -4,13 +4,13 @@ import numpy as np
 from scipy.signal import StateSpace
 
 
-class DcBrushedMotor:
-    """Models a DC brushed motor."""
+class DCMotor:
+    """Models a DC motor."""
 
     def __init__(
         self, nominal_voltage, stall_torque, stall_current, free_current, free_speed
     ):
-        """Holds the constants for a DC brushed motor.
+        """Holds the constants for a DC motor.
 
         Keyword arguments:
         nominal_voltage -- voltage at which the motor constants were measured
@@ -38,44 +38,44 @@ class DcBrushedMotor:
 
 
 # CIM
-MOTOR_CIM = DcBrushedMotor(12.0, 2.42, 133.0, 2.7, 5310.0)
+MOTOR_CIM = DCMotor(12.0, 2.42, 133.0, 2.7, 5310.0)
 
 # MiniCIM
-MOTOR_MINI_CIM = DcBrushedMotor(12.0, 1.41, 89.0, 3.0, 5840.0)
+MOTOR_MINI_CIM = DCMotor(12.0, 1.41, 89.0, 3.0, 5840.0)
 
 # Bag motor
-MOTOR_BAG = DcBrushedMotor(12.0, 0.43, 53.0, 1.8, 13180.0)
+MOTOR_BAG = DCMotor(12.0, 0.43, 53.0, 1.8, 13180.0)
 
 # 775 Pro
-MOTOR_775PRO = DcBrushedMotor(12.0, 0.71, 134.0, 0.7, 18730.0)
+MOTOR_775PRO = DCMotor(12.0, 0.71, 134.0, 0.7, 18730.0)
 
 # Andymark RS 775-125
-MOTOR_AM_RS775_125 = DcBrushedMotor(12.0, 0.28, 18.0, 1.6, 5800.0)
+MOTOR_AM_RS775_125 = DCMotor(12.0, 0.28, 18.0, 1.6, 5800.0)
 
 # Banebots RS 775
-MOTOR_BB_RS775 = DcBrushedMotor(12.0, 0.72, 97.0, 2.7, 13050.0)
+MOTOR_BB_RS775 = DCMotor(12.0, 0.72, 97.0, 2.7, 13050.0)
 
 # Andymark 9015
-MOTOR_AM_9015 = DcBrushedMotor(12.0, 0.36, 71.0, 3.7, 14270.0)
+MOTOR_AM_9015 = DCMotor(12.0, 0.36, 71.0, 3.7, 14270.0)
 
 # Banebots RS 550
-MOTOR_BB_RS550 = DcBrushedMotor(12.0, 0.38, 84.0, 0.4, 19000.0)
+MOTOR_BB_RS550 = DCMotor(12.0, 0.38, 84.0, 0.4, 19000.0)
 
 # NEO
-MOTOR_NEO = DcBrushedMotor(12.0, 2.6, 105.0, 1.8, 5676.0)
+MOTOR_NEO = DCMotor(12.0, 2.6, 105.0, 1.8, 5676.0)
 
 # NEO 550
-MOTOR_NEO_550 = DcBrushedMotor(12.0, 0.97, 100.0, 1.4, 11000.0)
+MOTOR_NEO_550 = DCMotor(12.0, 0.97, 100.0, 1.4, 11000.0)
 
 # Falcon 500
-MOTOR_FALCON_500 = DcBrushedMotor(12.0, 4.69, 257.0, 1.5, 6380.0)
+MOTOR_FALCON_500 = DCMotor(12.0, 4.69, 257.0, 1.5, 6380.0)
 
 
 def gearbox(motor, num_motors):
-    """Returns a DcBrushedMotor with the same characteristics as the specified
-    number of motors in a gearbox.
+    """Returns a DCMotor with the same characteristics as the specified number
+    of motors in a gearbox.
     """
-    return DcBrushedMotor(
+    return DCMotor(
         motor.nominal_voltage,
         motor.stall_torque * num_motors,
         motor.stall_current * num_motors,
@@ -92,7 +92,7 @@ def elevator(motor, num_motors, m, r, G):
     Outputs: [[position]]
 
     Keyword arguments:
-    motor -- instance of DcBrushedMotor
+    motor -- instance of DCMotor
     num_motors -- number of motors driving the mechanism
     m -- carriage mass in kg
     r -- pulley radius in meters
@@ -119,7 +119,7 @@ def flywheel(motor, num_motors, J, G):
     Outputs: [[angular velocity]]
 
     Keyword arguments:
-    motor -- instance of DcBrushedMotor
+    motor -- instance of DCMotor
     num_motors -- number of motors driving the mechanism
     J -- flywheel moment of inertia in kg-m^2
     G -- gear ratio from motor to flywheel
@@ -145,7 +145,7 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
     Outputs: [[left velocity], [right velocity]]
 
     Keyword arguments:
-    motor -- instance of DcBrushedMotor
+    motor -- instance of DCMotor
     num_motors -- number of motors driving the mechanism
     m -- mass of robot in kg
     r -- radius of wheels in meters
@@ -189,7 +189,7 @@ def single_jointed_arm(motor, num_motors, J, G):
     Outputs: [[angular velocity]]
 
     Keyword arguments:
-    motor -- instance of DcBrushedMotor
+    motor -- instance of DCMotor
     num_motors -- number of motors driving the mechanism
     J -- arm moment of inertia in kg-m^2
     G -- gear ratio from motor to arm
