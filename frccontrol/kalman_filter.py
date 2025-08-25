@@ -56,7 +56,11 @@ class KalmanFilter:
         #
         # Kᵀ = Sᵀ.solve(CPᵀ)
         # K = (Sᵀ.solve(CPᵀ))ᵀ
-        self.K = np.linalg.solve(S.T, C @ P.T).T
+        #
+        # Drop the transposes on symmetric matrices S and P.
+        #
+        # K = (S.solve(CP))ᵀ
+        self.K = np.linalg.solve(S, C @ P).T
 
         self.x_hat = np.zeros((self.plant.A.shape[0], 1))
 

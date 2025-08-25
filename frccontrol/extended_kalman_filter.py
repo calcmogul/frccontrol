@@ -129,7 +129,11 @@ class ExtendedKalmanFilter:
         #
         # Kᵀ = Sᵀ.solve(CPᵀ)
         # K = (Sᵀ.solve(CPᵀ))ᵀ
-        K = np.linalg.solve(S.T, C @ self.P.T).T
+        #
+        # Drop the transposes on symmetric matrices S and P.
+        #
+        # K = (S.solve(CP))ᵀ
+        K = np.linalg.solve(S, C @ self.P).T
 
         # x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
         self.x_hat += K @ (y - self.h(self.x_hat, u))
