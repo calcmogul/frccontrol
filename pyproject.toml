@@ -1,6 +1,6 @@
 [project]
 name = "frccontrol"
-description = "Provides math and controls utilities for the FIRST Robotics Competition"
+description = "Math and controls utilities for the FIRST Robotics Competition"
 dynamic = ["version"]
 readme = "README.md"
 license = "BSD-3-Clause"
