@@ -10,20 +10,22 @@ from .discretization import discretize_ab
 
 
 class LinearQuadraticRegulator:
-    """
-    Linear quadratic regulator class.
-    """
+    """Linear-quadratic regulator class."""
 
     def __init__(self, A, B, Qelems, Relems, dt):
         """
         Constructs a LinearQuadraticRegulator.
 
-        Keyword arguments:
-        A -- Continuous system matrix.
-        B -- Continuous input matrix.
-        Qelems -- The maximum desired error tolerance for each state.
-        Relems -- The maximum desired control effort for each input.
-        dt -- Discretization timestep.
+        Parameter ``A``:
+            Continuous system matrix.
+        Parameter ``B``:
+            Continuous input matrix.
+        Parameter ``Qelems``:
+            The maximum desired error tolerance for each state.
+        Parameter ``Relems``:
+            The maximum desired control effort for each input.
+        Parameter ``dt``:
+            Discretization timestep.
         """
         self.states = A.shape[0]
         self.inputs = B.shape[1]
@@ -47,9 +49,7 @@ class LinearQuadraticRegulator:
         self.u = np.zeros((self.inputs, 1))
 
     def reset(self):
-        """
-        Resets the controller.
-        """
+        """Resets the controller."""
         self.r = np.zeros((self.states, 1))
         self.u = np.zeros((self.inputs, 1))
 
@@ -57,9 +57,10 @@ class LinearQuadraticRegulator:
         """
         Returns the next output of the controller.
 
-        Keyword arguments:
-        x -- The current state vector x.
-        r -- The current reference vector r (default: previous reference)
+        Parameter ``x``:
+            The current state vector x.
+        Parameter ``r``:
+            The current reference vector r (default: previous reference).
         """
         if r is not None:
             self.r = r
@@ -79,11 +80,14 @@ class LinearQuadraticRegulator:
         See https://file.tavsys.net/control/controls-engineering-in-frc.pdf
         appendix C.4 for a derivation.
 
-        Keyword arguments:
-        A -- Continuous system matrix.
-        B -- Continuous input matrix.
-        dt -- Discretization timestep.
-        input_delay -- Input time delay.
+        Parameter ``A``:
+            Continuous system matrix.
+        Parameter ``B``:
+            Continuous input matrix.
+        Parameter ``dt``:
+            Discretization timestep.
+        Parameter ``input_delay``:
+            Input time delay.
         """
         discA, discB = discretize_ab(A, B, dt)
         self.K = self.K @ sp.linalg.fractional_matrix_power(

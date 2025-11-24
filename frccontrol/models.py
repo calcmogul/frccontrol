@@ -10,14 +10,19 @@ class DCMotor:
     def __init__(
         self, nominal_voltage, stall_torque, stall_current, free_current, free_speed
     ):
-        """Holds the constants for a DC motor.
+        """
+        Holds the constants for a DC motor.
 
-        Keyword arguments:
-        nominal_voltage -- voltage at which the motor constants were measured
-        stall_torque -- current draw when stalled in Newton-meters
-        stall_current  -- current draw when stalled in Amps
-        free_current -- current draw under no load in Amps
-        free_speed -- angular velocity under no load in RPM
+        Parameter ``nominal_voltage``:
+            Voltage at which the motor constants were measured.
+        Parameter ``stall_torque``:
+            Current draw when stalled in Newton-meters.
+        Parameter ``stall_current``:
+            Current draw when stalled in Amps.
+        Parameter ``free_current``:
+            Current draw under no load in Amps.
+        Parameter ``free_speed``:
+            Angular velocity under no load in RPM.
         """
         self.nominal_voltage = nominal_voltage
         self.stall_torque = stall_torque
@@ -85,21 +90,25 @@ def gearbox(motor, num_motors):
 
 
 def elevator(motor, num_motors, m, r, G):
-    """Returns the state-space model for an elevator.
+    """
+    Returns the state-space model for an elevator.
 
     States: [[position], [velocity]]
     Inputs: [[voltage]]
     Outputs: [[position]]
 
-    Keyword arguments:
-    motor -- instance of DCMotor
-    num_motors -- number of motors driving the mechanism
-    m -- carriage mass in kg
-    r -- pulley radius in meters
-    G -- gear ratio from motor to carriage
-
+    Parameter ``motor``:
+        Instance of DCMotor.
+    Parameter ``num_motors``:
+        Number of motors driving the mechanism.
+    Parameter ``m``:
+        Carriage mass in kg.
+    Parameter ``r``:
+        Pulley radius in meters.
+    Parameter ``G``:
+        Gear ratio from motor to carriage.
     Returns:
-    StateSpace instance containing continuous model
+        StateSpace instance containing continuous model.
     """
     motor = gearbox(motor, num_motors)
 
@@ -112,20 +121,23 @@ def elevator(motor, num_motors, m, r, G):
 
 
 def flywheel(motor, num_motors, J, G):
-    """Returns the state-space model for a flywheel.
+    """
+    Returns the state-space model for a flywheel.
 
     States: [[angular velocity]]
     Inputs: [[voltage]]
     Outputs: [[angular velocity]]
 
-    Keyword arguments:
-    motor -- instance of DCMotor
-    num_motors -- number of motors driving the mechanism
-    J -- flywheel moment of inertia in kg-m^2
-    G -- gear ratio from motor to flywheel
-
+    Parameter ``motor``:
+        Instance of DCMotor.
+    Parameter ``num_motors``:
+        Number of motors driving the mechanism.
+    Parameter ``J``:
+        Flywheel moment of inertia in kg-m².
+    Parameter ``G``:
+        Gear ratio from motor to flywheel.
     Returns:
-    StateSpace instance containing continuous model
+        StateSpace instance containing continuous model.
     """
     motor = gearbox(motor, num_motors)
 
@@ -138,24 +150,31 @@ def flywheel(motor, num_motors, J, G):
 
 
 def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
-    """Returns the state-space model for a differential drive.
+    """
+    Returns the state-space model for a differential drive.
 
     States: [[left velocity], [right velocity]]
     Inputs: [[left voltage], [right voltage]]
     Outputs: [[left velocity], [right velocity]]
 
-    Keyword arguments:
-    motor -- instance of DCMotor
-    num_motors -- number of motors driving the mechanism
-    m -- mass of robot in kg
-    r -- radius of wheels in meters
-    rb -- radius of robot in meters
-    J -- moment of inertia of the differential drive in kg-m^2
-    Gl -- gear ratio of left side of the differential drive
-    Gr -- gear ratio of right side of the differential drive
-
+    Parameter ``motor``:
+        Instance of DCMotor.
+    Parameter ``num_motors``:
+        Number of motors driving the mechanism.
+    Parameter ``m``:
+        Mass of robot in kg.
+    Parameter ``r``:
+        Radius of wheels in meters.
+    Parameter ``rb``:
+        Radius of robot in meters.
+    Parameter ``J``:
+        Moment of inertia of the differential drive in kg-m².
+    Parameter ``Gl``:
+        Gear ratio of left side of the differential drive.
+    Parameter ``Gr``:
+        Gear ratio of right side of the differential drive.
     Returns:
-    StateSpace instance containing continuous model
+        StateSpace instance containing continuous model.
     """
     motor = gearbox(motor, num_motors)
 
@@ -182,20 +201,23 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
 
 
 def single_jointed_arm(motor, num_motors, J, G):
-    """Returns the state-space model for a single-jointed arm.
+    """
+    Returns the state-space model for a single-jointed arm.
 
     States: [[angle, angular velocity]]
     Inputs: [[voltage]]
     Outputs: [[angular velocity]]
 
-    Keyword arguments:
-    motor -- instance of DCMotor
-    num_motors -- number of motors driving the mechanism
-    J -- arm moment of inertia in kg-m^2
-    G -- gear ratio from motor to arm
-
+    Parameter ``motor``:
+        Instance of DCMotor.
+    Parameter ``num_motors``:
+        Number of motors driving the mechanism.
+    Parameter ``J``:
+        Arm moment of inertia in kg-m².
+    Parameter ``G``:
+        Gear ratio from motor to arm.
     Returns:
-    StateSpace instance containing continuous model
+        StateSpace instance containing continuous model.
     """
     motor = gearbox(motor, num_motors)
 

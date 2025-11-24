@@ -10,9 +10,7 @@ from .discretization import discretize_ab, discretize_aq, discretize_r
 
 
 class KalmanFilter:
-    """
-    Linear Kalman filter class.
-    """
+    """Linear Kalman filter class."""
 
     def __init__(
         self,
@@ -24,11 +22,14 @@ class KalmanFilter:
         """
         Constructs a Kalman filter.
 
-        Keyword arguments:
-        plant -- The plant used for the prediction step.
-        state_std_devs -- Standard deviations of model states.
-        measurement_std_devs -- Standard deviations of measurements.
-        dt -- Nominal discretization timestep.
+        Parameter ``plant``:
+            The plant used for the prediction step.
+        Parameter ``state_std_devs``:
+            Standard deviations of model states.
+        Parameter ``measurement_std_devs``:
+            Standard deviations of measurements.
+        Parameter ``dt``:
+            Nominal discretization timestep.
         """
         self.plant = plant
 
@@ -74,9 +75,10 @@ class KalmanFilter:
         """
         Project the model into the future with a new control input u.
 
-        Keyword arguments:
-        u -- New control input from controller.
-        dt -- Timestep for prediction.
+        Parameter ``u``:
+            New control input from controller.
+        Parameter ``dt``:
+            Timestep for prediction.
         """
         A, B = discretize_ab(self.plant.A, self.plant.B, dt)
         self.x_hat = A @ self.x_hat + B @ u
@@ -85,9 +87,10 @@ class KalmanFilter:
         """
         Correct the state estimate x-hat using the measurements in y.
 
-        Keyword arguments:
-        u -- Same control input used in the last predict step.
-        y -- Measurement vector.
+        Parameter ``u``:
+            Same control input used in the last predict step.
+        Parameter ``y``:
+            Measurement vector.
         """
         # x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
         self.x_hat += self.K @ (y - (self.plant.C @ self.x_hat + self.plant.D @ u))

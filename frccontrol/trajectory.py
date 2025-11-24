@@ -1,22 +1,19 @@
-"""
-Cubic spline trajectory generator.
-"""
+"""Cubic spline trajectory generator."""
 
 import numpy as np
 
 
 class Trajectory:
-    """
-    Cubic spline trajectory.
-    """
+    """Cubic spline trajectory."""
 
     def __init__(self, times, states):
         """
         Initialize a Trajectory.
 
-        Keyword arguments:
-        times -- 1D array of trajectory timestamps.
-        states -- 2D array of corresponding states, where each state is a column
+        Parameter ``times``:
+            1D array of trajectory timestamps.
+        Parameter ``states``:
+            2D array of corresponding states, where each state is a column.
         """
         self.times = times.flatten()
         if states.shape[1] != len(times):
@@ -31,8 +28,8 @@ class Trajectory:
         """
         Limit Trajectory timestamp between start_time and end_time.
 
-        Keyword arguments:
-        time -- the time to clip
+        Parameter ``time``:
+            The time to clip.
         """
         return np.clip(time, self.start_time, self.end_time)
 
@@ -40,9 +37,10 @@ class Trajectory:
         """
         Insert state at the given time.
 
-        Keyword arguments:
-        time -- the time
-        state -- the state
+        Parameter ``time``:
+            The time.
+        Parameter ``state``:
+            The state.
         """
         if state.ndim == 1:
             state = np.array([state]).T
@@ -98,8 +96,8 @@ class Trajectory:
         Linearly interpolates between trajectory samples. If time is outside of
         trajectory, gives the start/end state.
 
-        Keyword arguments:
-        time -- time to sample
+        Parameter ``time``:
+            Time to sample.
         """
         time = self.clip_time(time)
         prev_idx = np.where(self.times <= time)[0][-1]
@@ -125,8 +123,8 @@ class Trajectory:
         immediately after the current trajectory ends. Skips the first element
         of the other trajectory to avoid repeats.
 
-        Keyword arguments:
-        other -- The other trajectory to append to this one.
+        Parameter ``other``:
+            The other trajectory to append to this one.
         """
         # Create new trajectory based off of this one
         combined = Trajectory(self.times, self.states)
@@ -148,17 +146,20 @@ def from_coeffs(coeffs: np.matrix, t_0, t_f, n=100) -> Trajectory:
     """
     Generate a trajectory from a polynomial coefficients matrix.
 
-    Keyword arguments:
-    coeffs -- Polynomial coefficients as columns in increasing order.
-              Can have arbitrarily many columns.
-    t_0 -- time to start the interpolation
-    t_f -- time to end the interpolation
-    n -- number of interpolation samples (default 100)
+    Parameter ``coeffs``:
+        Polynomial coefficients as columns in increasing order. Can have
+        arbitrarily many columns.
+    Parameter ``t_0``:
+        Time to start the interpolation.
+    Parameter ``t_f``:
+        Time to end the interpolation.
+    Parameter ``n``:
+        Number of interpolation samples (default 100).
 
     Returns:
-    Trajectory following the interpolation. The states will be in the form:
-    [pos_1, ..., pos_n, vel_1, ..., vel_n, accel_1, ..., accel_n]
-    Where n is the number of columns in coeffs.
+        Trajectory following the interpolation. The states will be in the form:
+        [pos_1, ..., pos_n, vel_1, ..., vel_n, accel_1, ..., accel_n]
+        Where n is the number of columns in coeffs.
     """
     order = np.size(coeffs, 0) - 1
     t = np.array([np.linspace(t_0, t_f, n)]).T
@@ -197,11 +198,14 @@ def interpolate_states(t_0, t_f, state_0, state_f):
     """
     Fit cubic polynomial between states.
 
-    Keyword arguments:
-    t_0 -- initial time
-    t_f -- final time
-    state_0 -- initial state
-    state_f -- final state
+    Parameter ``t_0``:
+        Initial time.
+    Parameter ``t_f``:
+        Final time.
+    Parameter ``state_0``:
+        Initial state.
+    Parameter ``state_f``:
+        Final state.
     """
     return from_coeffs(__cubic_interpolation(t_0, t_f, state_0, state_f), t_0, t_f)
 
@@ -227,15 +231,17 @@ def __cubic_interpolation(t_0, t_f, state_0, state_f):
 
     Make sure to only use the interpolated cubic for t between t_0 and t_f.
 
-    Keyword arguments:
-    t_0 -- start time of interpolation
-    t_f -- end time of interpolation
-    state_0 -- start state [θ₁, θ₂, ω₁, ω₂]ᵀ
-    state_f -- end state [θ₁, θ₂, ω₁, ω₂]ᵀ
-
+    Parameter ``t_0``:
+        Start time of interpolation.
+    Parameter ``t_f``:
+        End time of interpolation.
+    Parameter ``state_0``:
+        Start state [θ₁, θ₂, ω₁, ω₂]ᵀ.
+    Parameter ``state_f``:
+        End state [θ₁, θ₂, ω₁, ω₂]ᵀ.
     Returns:
-    coeffs -- 4x2 matrix containing the interpolation coefficients for joint 1
-              in column 1 and joint 2 in column 2
+        4x2 matrix containing the interpolation coefficients for joint 1 in
+        column 1 and joint 2 in column 2
     """
 
     def pos_row(t):

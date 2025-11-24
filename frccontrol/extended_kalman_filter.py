@@ -12,9 +12,7 @@ from .numerical_jacobian import numerical_jacobian_x
 
 
 class ExtendedKalmanFilter:
-    """
-    Extended Kalman filter class.
-    """
+    """Extended Kalman filter class."""
 
     def __init__(
         self,
@@ -29,16 +27,22 @@ class ExtendedKalmanFilter:
         """
         Constructs an extended Kalman filter.
 
-        Keyword arguments:
-        states -- Number of states.
-        inputs -- Number of inputs.
-        f -- A vector-valued function of x and u that returns the derivative of
-             the state vector.
-        h -- A vector-valued function of x and u that returns the measurement
-             vector.
-        state_std_devs -- Standard deviations of model states.
-        measurement_std_devs -- Standard deviations of measurements.
-        dt -- Nominal discretization timestep.
+        Parameter ``states``:
+            Number of states.
+        Parameter ``inputs``:
+            Number of inputs.
+        Parameter ``f``:
+            A vector-valued function of x and u that returns the derivative of
+            the state vector.
+        Parameter ``h``:
+            A vector-valued function of x and u that returns the measurement
+            vector.
+        Parameter ``state_std_devs``:
+            Standard deviations of model states.
+        Parameter ``measurement_std_devs``:
+            Standard deviations of measurements.
+        Parameter ``dt``:
+            Nominal discretization timestep.
         """
         self.states = states
         self.inputs = inputs
@@ -81,9 +85,10 @@ class ExtendedKalmanFilter:
         """
         Project the model into the future with a new control input u.
 
-        Keyword arguments:
-        u -- New control input from controller.
-        dt -- Timestep for prediction.
+        Parameter ``u``:
+            New control input from controller.
+        Parameter ``dt``:
+            Timestep for prediction.
         """
         # Find continuous A
         contA = numerical_jacobian_x(
@@ -108,9 +113,10 @@ class ExtendedKalmanFilter:
         """
         Correct the state estimate x-hat using the measurements in y.
 
-        Keyword arguments:
-        u -- Same control input used in the last predict step.
-        y -- Measurement vector.
+        Parameter ``u``:
+            Same control input used in the last predict step.
+        Parameter ``y``:
+            Measurement vector.
         """
         C = numerical_jacobian_x(self.outputs, self.states, self.h, self.x_hat, u)
         R = discretize_r(self.contR, self.dt)

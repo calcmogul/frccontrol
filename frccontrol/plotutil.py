@@ -10,16 +10,16 @@ def generate_time_responses(system, refs):
     """
     Generate time-domain responses of the system and the control inputs.
 
-    Keyword arguments:
-    system -- system for which to generate responses
-    refs -- list of reference vectors, one for each time
-
+    Parameter ``system``:
+        System for which to generate responses.
+    Parameter ``refs``:
+        List of reference vectors, one for each time.
     Returns:
-    r_rec -- recording of references
-    x_rec -- If system.observer exists, a recording of the state estimates.
-             Otherwise, a recording of the true states.
-    u_rec -- recording of inputs
-    y_rec -- recording of outputs
+        r_rec -- Recording of references.
+        x_rec -- If system.observer exists, a recording of the state estimates.
+                 Otherwise, a recording of the true states.
+        u_rec -- Recording of inputs.
+        y_rec -- Recording of outputs.
     """
     r_rec = np.zeros((system.x.shape[0], 0))
     x_rec = np.zeros((system.x.shape[0], 0))
@@ -55,16 +55,23 @@ def plot_time_responses(
     u_rec,
     title="Time-domain responses",
 ):
-    """Plots time-domain responses of the system and the control inputs.
+    """
+    Plots time-domain responses of the system and the control inputs.
 
-    Keyword arguments:
-    state_labels -- list of state label strings
-    input_labels -- list of input label strings
-    t_rec -- list of timesteps corresponding to references
-    r_rec -- recording of references from generate_time_responses()
-    x_rec -- recording of state estimates from generate_time_responses()
-    u_rec -- recording of inputs from generate_time_responses()
-    title -- title for time-domain plots (default: "Time-domain responses")
+    Parameter ``state_labels``:
+        List of state label strings.
+    Parameter ``input_labels``:
+        List of input label strings.
+    Parameter ``t_rec``:
+        List of timesteps corresponding to references.
+    Parameter ``r_rec``:
+        Recording of references from generate_time_responses().
+    Parameter ``x_rec``:
+        Recording of state estimates from generate_time_responses().
+    Parameter ``u_rec``:
+        Recording of inputs from generate_time_responses().
+    Parameter ``title``:
+        Title for time-domain plots (default: "Time-domain responses").
     """
     states = x_rec.shape[0]
     inputs = u_rec.shape[0]
