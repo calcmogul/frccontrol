@@ -4,6 +4,7 @@ description = "Math and controls utilities for the FIRST Robotics Competition"
 dynamic = ["version"]
 readme = "README.md"
 license = "BSD-3-Clause"
+license-files = ["LICENSE.txt"]
 requires-python = ">=3.10"
 dependencies = ["matplotlib", "numpy", "scipy"]
 classifiers = [
