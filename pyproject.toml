@@ -1,21 +1,19 @@
 [project]
 name = "frccontrol"
-description = "Provides SciPy wrappers for easing development of state-space models for the FIRST Robotics Competition"
-dynamic = [ "version" ]
-readme = "README.rst"
-dependencies = [ "matplotlib", "numpy", "scipy" ]
+description = "Provides math and controls utilities for the FIRST Robotics Competition"
+dynamic = ["version"]
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+dependencies = ["matplotlib", "numpy", "scipy"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Education",
-  "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Topic :: Scientific/Engineering",
   "Programming Language :: Python :: 3"
 ]
-
-  [project.license]
-  text = "BSD-3-Clause"
 
   [[project.authors]]
   name = "Tyler Veness"
@@ -40,4 +38,4 @@ version_callback = "frccontrol.version:get_version"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-testpaths = [ "frccontrol/test" ]
+testpaths = ["frccontrol/test"]
