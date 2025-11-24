@@ -3,6 +3,7 @@
 from .ctrlutil import *
 from .discretization import *
 from .extended_kalman_filter import *
+from .geometry import *
 from .kalman_filter import *
 from .linear_plant_inversion_feedforward import *
 from .linear_quadratic_regulator import *
