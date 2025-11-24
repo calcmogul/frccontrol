@@ -1,6 +1,5 @@
-from datetime import date
-import os
 import subprocess
+from datetime import date
 
 
 def get_version():
