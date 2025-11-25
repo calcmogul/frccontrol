@@ -5,7 +5,7 @@ Linear Kalman filter class.
 import numpy as np
 import scipy as sp
 
-from .ctrlutil import is_detectable, make_cov_matrix
+from .ctrlutil import covariance_matrix, is_detectable
 from .discretization import discretize_ab, discretize_aq, discretize_r
 
 
@@ -33,9 +33,9 @@ class KalmanFilter:
         """
         self.plant = plant
 
-        A, Q = discretize_aq(plant.A, make_cov_matrix(state_std_devs), dt)
+        A, Q = discretize_aq(plant.A, covariance_matrix(state_std_devs), dt)
         C = plant.C
-        R = discretize_r(make_cov_matrix(measurement_std_devs), dt)
+        R = discretize_r(covariance_matrix(measurement_std_devs), dt)
 
         if not is_detectable(A, C):
             raise RuntimeError(f"The system is undetectable!\n\nA = {A}\nC = {C}\n")

@@ -4,7 +4,7 @@ import numpy as np
 import scipy as sp
 
 
-def make_cost_matrix(elems):
+def cost_matrix(elems):
     """
     Creates a cost matrix from the given vector for use with LQR.
 
@@ -23,7 +23,7 @@ def make_cost_matrix(elems):
     return np.diag([0.0 if elem == float("inf") else 1.0 / elem**2 for elem in elems])
 
 
-def make_cov_matrix(elems):
+def covariance_matrix(elems):
     """
     Creates a covariance matrix from the given vector for use with Kalman
     filters.

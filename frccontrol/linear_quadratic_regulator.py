@@ -5,7 +5,7 @@ Linear quadratic regulator class.
 import numpy as np
 import scipy as sp
 
-from .ctrlutil import is_stabilizable, make_cost_matrix
+from .ctrlutil import cost_matrix, is_stabilizable
 from .discretization import discretize_ab
 
 
@@ -37,8 +37,8 @@ class LinearQuadraticRegulator:
                 f"The system is unstabilizable!\n\nA = {discA}\nB = {discB}\n"
             )
 
-        Q = make_cost_matrix(Qelems)
-        R = make_cost_matrix(Relems)
+        Q = cost_matrix(Qelems)
+        R = cost_matrix(Relems)
 
         S = sp.linalg.solve_discrete_are(a=discA, b=discB, q=Q, r=R)
 

@@ -5,7 +5,7 @@ Extended Kalman filter class.
 import numpy as np
 import scipy as sp
 
-from .ctrlutil import is_detectable, make_cov_matrix
+from .ctrlutil import covariance_matrix, is_detectable
 from .discretization import discretize_aq, discretize_r
 from .numerical_integration import rkdp
 from .numerical_jacobian import numerical_jacobian_x
@@ -53,8 +53,8 @@ class ExtendedKalmanFilter:
         self.dt = dt
         self.x_hat = np.zeros((self.states, 1))
 
-        self.contQ = make_cov_matrix(state_std_devs)
-        self.contR = make_cov_matrix(measurement_std_devs)
+        self.contQ = covariance_matrix(state_std_devs)
+        self.contR = covariance_matrix(measurement_std_devs)
 
         contA = numerical_jacobian_x(
             self.states, self.states, self.f, self.x_hat, np.zeros((inputs, 1))
