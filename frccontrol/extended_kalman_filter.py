@@ -119,9 +119,9 @@ class ExtendedKalmanFilter:
             Measurement vector.
         """
         C = numerical_jacobian_x(self.outputs, self.states, self.h, self.x_hat, u)
-        R = discretize_r(self.contR, self.dt)
+        discR = discretize_r(self.contR, self.dt)
 
-        S = C @ self.P @ C.T + R
+        S = C @ self.P @ C.T + discR
 
         # We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
         # efficiently.
@@ -146,6 +146,5 @@ class ExtendedKalmanFilter:
 
         # Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
         # Use Joseph form for numerical stability
-        self.P = (np.eye(self.states) - K @ C) @ self.P @ (
-            np.eye(self.states) - K @ C
-        ).T + K @ R @ K.T
+        I = np.eye(self.states)
+        self.P = (I - K @ C) @ self.P @ (I - K @ C).T + K @ discR @ K.T
