@@ -57,7 +57,6 @@ class DoubleJointedArm:
         self.u_min = np.array([[-12.0]])
         self.u_max = np.array([[12.0]])
 
-    # pragma pylint: disable=unused-argument
     def update(self, r, next_r):
         """
         Advance the model by one timestep.
@@ -382,7 +381,6 @@ def animate_arm(arm: DoubleJointedArm, x_rec, r_rec):
 
         return arm_line, ref_line
 
-    # pragma pylint: disable=unused-variable
     anim = animation.FuncAnimation(
         fig,
         animate,

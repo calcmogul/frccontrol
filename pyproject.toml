@@ -33,6 +33,9 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.ruff.lint]
+ignore = ["E741", "F403", "F841"]
+
 [tool.setuptools-git-versioning]
 enabled = true
 version_callback = "frccontrol.version:get_version"
