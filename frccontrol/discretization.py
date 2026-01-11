@@ -10,8 +10,10 @@ def discretize_a(A, dt):
 
     Parameter ``A``:
         Continuous system matrix.
+
     Parameter ``dt``:
         Discretization timestep.
+
     Returns:
         Discrete system matrix.
     """
@@ -25,10 +27,13 @@ def discretize_ab(A, B, dt):
 
     Parameter ``A``:
         Continuous system matrix.
+
     Parameter ``B``:
         Continuous input matrix.
+
     Parameter ``dt``:
         Discretization timestep.
+
     Returns:
         Discrete system matrix, discrete input matrix.
     """
@@ -53,10 +58,13 @@ def discretize_aq(A, Q, dt):
 
     Parameter ``A``:
         Continuous system matrix.
+
     Parameter ``Q``:
         Continuous process noise covariance matrix.
+
     Parameter ``dt``:
         Discretization timestep.
+
     Returns:
         Discrete system matrix, discrete process noise covariance matrix.
     """
@@ -93,8 +101,10 @@ def discretize_r(R, dt):
 
     Parameter ``R``:
         Continuous measurement noise covariance matrix.
+
     Parameter ``dt``:
         Discretization timestep.
+
     Returns:
         Discrete measurement noise covariance matrix.
     """

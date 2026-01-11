@@ -20,6 +20,7 @@ class Translation2d:
 
         Parameter ``distance``:
             The distance from the origin to the end of the translation.
+
         Parameter ``angle``:
             The angle between the x-axis and the translation vector.
         """
@@ -94,6 +95,7 @@ class Translation2d:
 
         Parameter ``other``:
             The other translation to rotate around.
+
         Parameter ``rot``:
             The rotation to rotate the translation by.
         """
@@ -246,8 +248,10 @@ class Pose2d:
 
         Parameter ``x``:
             The x component.
+
         Parameter ``y``:
             The y component.
+
         Parameter ``θ``:
             The heading component.
         """
@@ -317,6 +321,7 @@ class Pose2d:
 
         Parameter ``point``:
             The point in 2D space to rotate around.
+
         Parameter ``rot``:
             The rotation to rotate the pose by.
         """
@@ -345,8 +350,10 @@ class Transform2d:
 
         Parameter ``x``:
             The x component.
+
         Parameter ``y``:
             The y component.
+
         Parameter ``θ``:
             The heading component.
         """
@@ -359,6 +366,7 @@ class Transform2d:
 
         Parameter ``initial``:
             The initial pose.
+
         Parameter ``final``:
             The final pose.
         """
@@ -450,8 +458,10 @@ class Twist2d:
 
         Parameter ``dx``:
             Linear "dx" component.
+
         Parameter ``dy``:
             Linear "dy" component.
+
         Parameter ``dθ``:
             Angular "dtheta" component (radians).
         """

@@ -17,6 +17,7 @@ def cost_matrix(elems):
         excursions of the states from the reference. For an R matrix, its
         elements are the maximum allowed excursions of the control inputs from
         no actuation.
+
     Returns:
         State excursion or control effort cost matrix.
     """
@@ -34,6 +35,7 @@ def covariance_matrix(elems):
         A vector. For a Q matrix, its elements are the standard deviations of
         each state from how the model behaves. For an R matrix, its elements are
         the standard deviations for each output measurement.
+
     Returns:
         Process noise or measurement noise covariance matrix.
     """
@@ -50,6 +52,7 @@ def is_stabilizable(A, B):
 
     Parameter ``A``:
         System matrix.
+
     Parameter ``B``:
         Input matrix.
     """
@@ -77,6 +80,7 @@ def is_detectable(A, C):
 
     Parameter ``A``:
         System matrix.
+
     Parameter ``C``:
         Output matrix.
     """
@@ -89,6 +93,7 @@ def ctrb(A, B):
 
     Parameter ``A``:
         System matrix.
+
     Parameter ``B``:
         Input matrix.
     """
@@ -103,6 +108,7 @@ def obsv(A, C):
 
     Parameter ``A``:
         System matrix.
+
     Parameter ``C``:
         Output matrix.
     """

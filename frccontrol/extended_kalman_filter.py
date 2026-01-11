@@ -29,18 +29,24 @@ class ExtendedKalmanFilter:
 
         Parameter ``states``:
             Number of states.
+
         Parameter ``inputs``:
             Number of inputs.
+
         Parameter ``f``:
             A vector-valued function of x and u that returns the derivative of
             the state vector.
+
         Parameter ``h``:
             A vector-valued function of x and u that returns the measurement
             vector.
+
         Parameter ``state_std_devs``:
             Standard deviations of model states.
+
         Parameter ``measurement_std_devs``:
             Standard deviations of measurements.
+
         Parameter ``dt``:
             Nominal discretization timestep.
         """
@@ -87,6 +93,7 @@ class ExtendedKalmanFilter:
 
         Parameter ``u``:
             New control input from controller.
+
         Parameter ``dt``:
             Timestep for prediction.
         """
@@ -115,6 +122,7 @@ class ExtendedKalmanFilter:
 
         Parameter ``u``:
             Same control input used in the last predict step.
+
         Parameter ``y``:
             Measurement vector.
         """

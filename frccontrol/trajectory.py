@@ -12,6 +12,7 @@ class Trajectory:
 
         Parameter ``times``:
             1D array of trajectory timestamps.
+
         Parameter ``states``:
             2D array of corresponding states, where each state is a column.
         """
@@ -39,6 +40,7 @@ class Trajectory:
 
         Parameter ``time``:
             The time.
+
         Parameter ``state``:
             The state.
         """
@@ -149,10 +151,13 @@ def from_coeffs(coeffs: np.matrix, t_0, t_f, n=100) -> Trajectory:
     Parameter ``coeffs``:
         Polynomial coefficients as columns in increasing order. Can have
         arbitrarily many columns.
+
     Parameter ``t_0``:
         Time to start the interpolation.
+
     Parameter ``t_f``:
         Time to end the interpolation.
+
     Parameter ``n``:
         Number of interpolation samples (default 100).
 
@@ -200,10 +205,13 @@ def interpolate_states(t_0, t_f, state_0, state_f):
 
     Parameter ``t_0``:
         Initial time.
+
     Parameter ``t_f``:
         Final time.
+
     Parameter ``state_0``:
         Initial state.
+
     Parameter ``state_f``:
         Final state.
     """
@@ -233,12 +241,16 @@ def __cubic_interpolation(t_0, t_f, state_0, state_f):
 
     Parameter ``t_0``:
         Start time of interpolation.
+
     Parameter ``t_f``:
         End time of interpolation.
+
     Parameter ``state_0``:
         Start state [θ₁, θ₂, ω₁, ω₂]ᵀ.
+
     Parameter ``state_f``:
         End state [θ₁, θ₂, ω₁, ω₂]ᵀ.
+
     Returns:
         4x2 matrix containing the interpolation coefficients for joint 1 in
         column 1 and joint 2 in column 2

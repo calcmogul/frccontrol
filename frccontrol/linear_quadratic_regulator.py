@@ -18,12 +18,16 @@ class LinearQuadraticRegulator:
 
         Parameter ``A``:
             Continuous system matrix.
+
         Parameter ``B``:
             Continuous input matrix.
+
         Parameter ``Qelems``:
             The maximum desired error tolerance for each state.
+
         Parameter ``Relems``:
             The maximum desired control effort for each input.
+
         Parameter ``dt``:
             Discretization timestep.
         """
@@ -59,6 +63,7 @@ class LinearQuadraticRegulator:
 
         Parameter ``x``:
             The current state vector x.
+
         Parameter ``r``:
             The current reference vector r (default: previous reference).
         """
@@ -82,10 +87,13 @@ class LinearQuadraticRegulator:
 
         Parameter ``A``:
             Continuous system matrix.
+
         Parameter ``B``:
             Continuous input matrix.
+
         Parameter ``dt``:
             Discretization timestep.
+
         Parameter ``input_delay``:
             Input time delay.
         """

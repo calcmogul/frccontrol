@@ -24,10 +24,13 @@ class KalmanFilter:
 
         Parameter ``plant``:
             The plant used for the prediction step.
+
         Parameter ``state_std_devs``:
             Standard deviations of model states.
+
         Parameter ``measurement_std_devs``:
             Standard deviations of measurements.
+
         Parameter ``dt``:
             Nominal discretization timestep.
         """
@@ -63,6 +66,7 @@ class KalmanFilter:
 
         Parameter ``u``:
             New control input from controller.
+
         Parameter ``dt``:
             Timestep for prediction.
         """
@@ -83,6 +87,7 @@ class KalmanFilter:
 
         Parameter ``u``:
             Same control input used in the last predict step.
+
         Parameter ``y``:
             Measurement vector.
         """

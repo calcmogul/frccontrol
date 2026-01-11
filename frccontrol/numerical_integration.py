@@ -10,10 +10,13 @@ def rk4(f, x, u, dt):
 
     Parameter ``f``:
         Vector function to integrate.
+
     Parameter ``x``:
         Vector of states.
+
     Parameter ``u``:
         Vector of inputs (constant for dt).
+
     Parameter ``dt``:
         Time for which to integrate.
     """
@@ -31,10 +34,13 @@ def rkdp(f, x, u, dt, max_error=1e-6):
 
     Parameter ``f``:
         Vector function to integrate.
+
     Parameter ``x``:
         Vector of states.
+
     Parameter ``u``:
         Vector of inputs (constant for dt).
+
     Parameter ``dt``:
         Time for which to integrate.
     """

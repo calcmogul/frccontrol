@@ -15,12 +15,16 @@ class DCMotor:
 
         Parameter ``nominal_voltage``:
             Voltage at which the motor constants were measured.
+
         Parameter ``stall_torque``:
             Current draw when stalled in Newton-meters.
+
         Parameter ``stall_current``:
             Current draw when stalled in Amps.
+
         Parameter ``free_current``:
             Current draw under no load in Amps.
+
         Parameter ``free_speed``:
             Angular velocity under no load in RPM.
         """
@@ -99,14 +103,19 @@ def elevator(motor, num_motors, m, r, G):
 
     Parameter ``motor``:
         Instance of DCMotor.
+
     Parameter ``num_motors``:
         Number of motors driving the mechanism.
+
     Parameter ``m``:
         Carriage mass in kg.
+
     Parameter ``r``:
         Pulley radius in meters.
+
     Parameter ``G``:
         Gear ratio from motor to carriage.
+
     Returns:
         StateSpace instance containing continuous model.
     """
@@ -130,12 +139,16 @@ def flywheel(motor, num_motors, J, G):
 
     Parameter ``motor``:
         Instance of DCMotor.
+
     Parameter ``num_motors``:
         Number of motors driving the mechanism.
+
     Parameter ``J``:
         Flywheel moment of inertia in kg-m².
+
     Parameter ``G``:
         Gear ratio from motor to flywheel.
+
     Returns:
         StateSpace instance containing continuous model.
     """
@@ -159,20 +172,28 @@ def differential_drive(motor, num_motors, m, r, rb, J, Gl, Gr):
 
     Parameter ``motor``:
         Instance of DCMotor.
+
     Parameter ``num_motors``:
         Number of motors driving the mechanism.
+
     Parameter ``m``:
         Mass of robot in kg.
+
     Parameter ``r``:
         Radius of wheels in meters.
+
     Parameter ``rb``:
         Radius of robot in meters.
+
     Parameter ``J``:
         Moment of inertia of the differential drive in kg-m².
+
     Parameter ``Gl``:
         Gear ratio of left side of the differential drive.
+
     Parameter ``Gr``:
         Gear ratio of right side of the differential drive.
+
     Returns:
         StateSpace instance containing continuous model.
     """
@@ -210,12 +231,16 @@ def single_jointed_arm(motor, num_motors, J, G):
 
     Parameter ``motor``:
         Instance of DCMotor.
+
     Parameter ``num_motors``:
         Number of motors driving the mechanism.
+
     Parameter ``J``:
         Arm moment of inertia in kg-m².
+
     Parameter ``G``:
         Gear ratio from motor to arm.
+
     Returns:
         StateSpace instance containing continuous model.
     """

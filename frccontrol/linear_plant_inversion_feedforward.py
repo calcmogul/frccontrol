@@ -16,8 +16,10 @@ class LinearPlantInversionFeedforward:
 
         Parameter ``A``:
             Continuous system matrix of the plant being controlled.
+
         Parameter ``B``:
             Continuous input matrix of the plant being controlled.
+
         Parameter ``dt``:
             Discretization timestep.
         """
@@ -43,6 +45,7 @@ class LinearPlantInversionFeedforward:
 
         Parameter ``next_r``:
             The reference state of the future timestep (k + 1).
+
         Returns:
             The calculated feedforward.
         """
