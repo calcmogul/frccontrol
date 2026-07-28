@@ -1,6 +1,7 @@
 """Functions for integrating nonlinear system dynamics."""
 
 import math
+
 import numpy as np
 
 
@@ -95,68 +96,59 @@ def rkdp(f, x, u, dt, max_error=1e-6):
         ]
     )
 
-    truncation_error = float("inf")
-
+    # Loop until dt has elapsed
     dt_elapsed = 0.0
     h = dt
-
-    # Loop until we've gotten to our desired dt
     while dt_elapsed < dt:
-        while truncation_error > max_error:
-            # Only allow us to advance up to the dt remaining
-            h = min(h, dt - dt_elapsed)
+        k1 = f(x, u)
+        k2 = f(x + h * (A[0, 0] * k1), u)
+        k3 = f(x + h * (A[1, 0] * k1 + A[1, 1] * k2), u)
+        k4 = f(x + h * (A[2, 0] * k1 + A[2, 1] * k2 + A[2, 2] * k3), u)
+        k5 = f(x + h * (A[3, 0] * k1 + A[3, 1] * k2 + A[3, 2] * k3 + A[3, 3] * k4), u)
+        k6 = f(
+            x
+            + h
+            * (
+                A[4, 0] * k1 + A[4, 1] * k2 + A[4, 2] * k3 + A[4, 3] * k4 + A[4, 4] * k5
+            ),
+            u,
+        )
 
-            k1 = f(x, u)
-            k2 = f(x + h * (A[0, 0] * k1), u)
-            k3 = f(x + h * (A[1, 0] * k1 + A[1, 1] * k2), u)
-            k4 = f(x + h * (A[2, 0] * k1 + A[2, 1] * k2 + A[2, 2] * k3), u)
-            k5 = f(
-                x + h * (A[3, 0] * k1 + A[3, 1] * k2 + A[3, 2] * k3 + A[3, 3] * k4), u
+        # Since the final row of A and the array b1 have the same coefficients
+        # and k7 has no effect on newX, we can reuse the calculation.
+        new_x = x + h * (
+            A[5, 0] * k1
+            + A[5, 1] * k2
+            + A[5, 2] * k3
+            + A[5, 3] * k4
+            + A[5, 4] * k5
+            + A[5, 5] * k6
+        )
+        k7 = f(new_x, u)
+
+        truncation_error = np.linalg.norm(
+            h
+            * (
+                (b1[0] - b2[0]) * k1
+                + (b1[1] - b2[1]) * k2
+                + (b1[2] - b2[2]) * k3
+                + (b1[3] - b2[3]) * k4
+                + (b1[4] - b2[4]) * k5
+                + (b1[5] - b2[5]) * k6
+                + (b1[6] - b2[6]) * k7
             )
-            k6 = f(
-                x
-                + h
-                * (
-                    A[4, 0] * k1
-                    + A[4, 1] * k2
-                    + A[4, 2] * k3
-                    + A[4, 3] * k4
-                    + A[4, 4] * k5
-                ),
-                u,
+        )
+
+        if truncation_error <= max_error:
+            # Accept the step
+            x = new_x
+            dt_elapsed += h
+
+        if truncation_error == 0.0:
+            h = dt - dt_elapsed
+        else:
+            h = min(
+                0.9 * h * math.pow(max_error / truncation_error, 0.2), dt - dt_elapsed
             )
-
-            # Since the final row of A and the array b1 have the same coefficients
-            # and k7 has no effect on newX, we can reuse the calculation.
-            new_x = x + h * (
-                A[5, 0] * k1
-                + A[5, 1] * k2
-                + A[5, 2] * k3
-                + A[5, 3] * k4
-                + A[5, 4] * k5
-                + A[5, 5] * k6
-            )
-            k7 = f(new_x, u)
-
-            truncation_error = np.linalg.norm(
-                h
-                * (
-                    (b1[0] - b2[0]) * k1
-                    + (b1[1] - b2[1]) * k2
-                    + (b1[2] - b2[2]) * k3
-                    + (b1[3] - b2[3]) * k4
-                    + (b1[4] - b2[4]) * k5
-                    + (b1[5] - b2[5]) * k6
-                    + (b1[6] - b2[6]) * k7
-                )
-            )
-
-            if truncation_error == 0.0:
-                h = dt - dt_elapsed
-            else:
-                h *= 0.9 * math.pow(max_error / truncation_error, 1.0 / 5.0)
-
-        dt_elapsed += h
-        x = new_x
 
     return x
