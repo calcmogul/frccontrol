@@ -111,7 +111,7 @@ class ExtendedKalmanFilter:
 
         self.x_hat = rkdp(self.f, self.x_hat, u, dt)
 
-        # Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
+        # Pₖ₊₁⁻ = AₖPₖ⁻Aₖᵀ + Qₖ
         self.P = discA @ self.P @ discA.T + discQ
 
         self.dt = dt
@@ -129,30 +129,19 @@ class ExtendedKalmanFilter:
         C = numerical_jacobian_x(self.outputs, self.states, self.h, self.x_hat, u)
         discR = discretize_r(self.contR, self.dt)
 
+        # Sₖ₊₁ = Cₖ₊₁Pₖ₊₁⁻Cₖ₊₁ᵀ + R
         S = C @ self.P @ C.T + discR
 
-        # We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-        # efficiently.
-        #
-        # K = PCᵀS⁻¹
-        # KS = PCᵀ
-        # (KS)ᵀ = (PCᵀ)ᵀ
-        # SᵀKᵀ = CPᵀ
-        #
-        # The solution of Ax = b can be found via x = A.solve(b).
-        #
-        # Kᵀ = Sᵀ.solve(CPᵀ)
-        # K = (Sᵀ.solve(CPᵀ))ᵀ
-        #
-        # Drop the transposes on symmetric matrices S and P.
-        #
-        # K = (S.solve(CP))ᵀ
+        # Kₖ₊₁ = Pₖ₊₁⁻Cₖ₊₁ᵀSₖ₊₁⁻¹
+        # K = PCᵀ / S
+        # K = (Sᵀ \ CPᵀ)ᵀ
+        # K = (S \ CP)ᵀ because S and P are symmetric
         K = np.linalg.solve(S, C @ self.P).T
 
         # x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
         self.x_hat += K @ (y - self.h(self.x_hat, u))
 
-        # Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+        # Pₖ₊₁⁺ = (I − Kₖ₊₁Cₖ₊₁)Pₖ₊₁⁻(I − Kₖ₊₁Cₖ₊₁)ᵀ + Kₖ₊₁Rₖ₊₁Kₖ₊₁ᵀ
         # Use Joseph form for numerical stability
         I = np.eye(self.states)
         self.P = (I - K @ C) @ self.P @ (I - K @ C).T + K @ discR @ K.T

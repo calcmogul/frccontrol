@@ -48,22 +48,10 @@ class SteadyStateKalmanFilter:
         # S = CPCᵀ + R
         S = C @ P @ C.T + discR
 
-        # We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-        # efficiently.
-        #
         # K = PCᵀS⁻¹
-        # KS = PCᵀ
-        # (KS)ᵀ = (PCᵀ)ᵀ
-        # SᵀKᵀ = CPᵀ
-        #
-        # The solution of Ax = b can be found via x = A.solve(b).
-        #
-        # Kᵀ = Sᵀ.solve(CPᵀ)
-        # K = (Sᵀ.solve(CPᵀ))ᵀ
-        #
-        # Drop the transposes on symmetric matrices S and P.
-        #
-        # K = (S.solve(CP))ᵀ
+        # K = PCᵀ / S
+        # K = (Sᵀ \ CPᵀ)ᵀ
+        # K = (S \ CP)ᵀ because S and P are symmetric
         self.K = np.linalg.solve(S, C @ P).T
 
         self.x_hat = np.zeros((self.plant.A.shape[0], 1))
