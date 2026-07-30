@@ -49,6 +49,6 @@ class LinearPlantInversionFeedforward:
         Returns:
             The calculated feedforward.
         """
-        self.u_ff = np.linalg.pinv(self.B) @ (next_r - (self.A @ self.r))
+        self.u_ff = np.linalg.pinv(self.B) @ (next_r - self.A @ self.r)
         self.r = next_r
         return self.u_ff
