@@ -1,7 +1,9 @@
 #!/bin/bash
 
+set -e
+
 rm -rf dist
-git checkout main || exit 1
+git checkout main
 
 # Ensure no files are untracked, changed, or staged respectively
 if [ `echo -n $(git clean -n) | wc -c` != 0 ]; then
@@ -17,6 +19,7 @@ if [ `echo -n $(git diff --staged) | wc -c` != 0 ]; then
   exit 1
 fi
 
-git pull https://github.com/calcmogul/frccontrol main || exit 1
+git pull https://github.com/calcmogul/frccontrol main
 python -m build
+python -m pytest
 twine upload dist/*
