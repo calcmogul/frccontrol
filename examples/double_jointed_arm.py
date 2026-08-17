@@ -29,8 +29,8 @@ class DoubleJointedArm:
         """
         Double-jointed arm subsystem.
 
-        Keyword arguments:
-        dt -- simulation step time
+        Args:
+            dt: Simulation step time.
         """
         self.dt = dt
 
@@ -61,9 +61,9 @@ class DoubleJointedArm:
         """
         Advance the model by one timestep.
 
-        Keyword arguments:
-        r -- the current reference
-        next_r -- the next reference
+        Args:
+            r: The current reference.
+            next_r: The next reference.
         """
         self.x = fct.rkdp(self.f, self.x, self.u, self.dt)
         self.y = self.h(self.x, self.u)
@@ -112,8 +112,8 @@ class DoubleJointedArm:
         See derivation at:
         https://www.chiefdelphi.com/t/whitepaper-two-jointed-arm-dynamics/423060
 
-        Keyword arguments:
-        x -- current system state
+        Args:
+            x: Current system state.
         """
         theta1, theta2, omega1, omega2 = x[:4].flat
         c2 = np.cos(theta2)
@@ -152,9 +152,9 @@ class DoubleJointedArm:
         """
         Dynamics model.
 
-        Keyword arguments:
-        x -- state vector
-        u -- input vector
+        Args:
+            x: State vector.
+            u: Input vector.
         """
         M, C, G = self.get_dynamics_matrices(x)
 
@@ -172,9 +172,9 @@ class DoubleJointedArm:
         """
         Measurement model.
 
-        Keyword arguments:
-        x -- state vector
-        u -- input vector
+        Args:
+            x: State vector.
+            u: Input vector.
         """
         return x[:2, :]
 
@@ -257,13 +257,13 @@ class DoubleJointedArmConstants:
         Inverse kinematics for a target position pos (x, y). The invert flag
         controls elbow direction.
 
-        Keyword arguments:
-        x -- x position
-        y -- y position
+        Args:
+            x: x position.
+            y: y position.
 
         Returns:
-        theta1 -- joint 1 angle
-        theta2 -- joint 2 angle
+            theta1: Joint 1 angle.
+            theta2: Joint 2 angle.
         """
         theta2 = np.arccos(
             (x * x + y * y - (self.l1 * self.l1 + self.l2 * self.l2))
@@ -337,10 +337,10 @@ def animate_arm(arm: DoubleJointedArm, x_rec, r_rec):
     """
     Animates arm.
 
-    Keyword arguments:
-    arm -- the arm being simulated
-    x_rec -- state recording
-    r_rec -- reference recording
+    Args:
+        arm: The arm being simulated.
+        x_rec: State recording.
+        r_rec: Reference recording.
     """
 
     def get_arm_joints(x):

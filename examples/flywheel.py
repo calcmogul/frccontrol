@@ -21,8 +21,8 @@ class Flywheel:
     def __init__(self, dt):
         """Flywheel subsystem.
 
-        Keyword arguments:
-        dt -- time between model/controller updates
+        Args:
+            dt: Time between model/controller updates.
         """
         self.dt = dt
 
@@ -58,9 +58,9 @@ class Flywheel:
         """
         Advance the model by one timestep.
 
-        Keyword arguments:
-        r -- the current reference
-        next_r -- the next reference
+        Args:
+            r: The current reference.
+            next_r: The next reference.
         """
         # Update sim model
         self.x = self.sim.A @ self.x + self.sim.B @ self.u
