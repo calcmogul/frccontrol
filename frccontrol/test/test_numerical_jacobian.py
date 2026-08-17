@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from frccontrol.numerical_jacobian import numerical_jacobian_x, numerical_jacobian_u
+from frccontrol.numerical_jacobian import numerical_jacobian_u, numerical_jacobian_x
 
 
 def test_numerical_jacobian():

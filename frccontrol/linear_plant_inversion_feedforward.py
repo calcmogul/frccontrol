@@ -14,14 +14,10 @@ class LinearPlantInversionFeedforward:
         """
         Constructs a linear plant inversion feedforward.
 
-        Parameter ``A``:
-            Continuous system matrix of the plant being controlled.
-
-        Parameter ``B``:
-            Continuous input matrix of the plant being controlled.
-
-        Parameter ``dt``:
-            Discretization timestep.
+        Args:
+            A: Continuous system matrix of the plant being controlled.
+            B: Continuous input matrix of the plant being controlled.
+            dt: Discretization timestep.
         """
         self.A, self.B = discretize_ab(A, B, dt)
         self.r = np.zeros((A.shape[0], 1))
@@ -31,8 +27,8 @@ class LinearPlantInversionFeedforward:
         """
         Resets the feedforward with a specified initial reference vector.
 
-        Parameter ``initial_reference``:
-            The initial reference vector.
+        Args:
+            initial_reference: The initial reference vector.
         """
         self.r = initial_reference
         self.u_ff = np.zeros(self.u_ff.shape)
@@ -43,8 +39,8 @@ class LinearPlantInversionFeedforward:
         uses the internally stored "current" reference (calling reset() will
         override this).
 
-        Parameter ``next_r``:
-            The reference state of the future timestep (k + 1).
+        Args:
+            next_r: The reference state of the future timestep (k + 1).
 
         Returns:
             The calculated feedforward.

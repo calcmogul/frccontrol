@@ -22,17 +22,11 @@ class KalmanFilter:
         """
         Constructs a Kalman filter.
 
-        Parameter ``plant``:
-            The plant used for the prediction step.
-
-        Parameter ``state_std_devs``:
-            Standard deviations of model states.
-
-        Parameter ``measurement_std_devs``:
-            Standard deviations of measurements.
-
-        Parameter ``dt``:
-            Nominal discretization timestep.
+        Args:
+            plant: The plant used for the prediction step.
+            state_std_devs: Standard deviations of model states.
+            measurement_std_devs: Standard deviations of measurements.
+            dt: Nominal discretization timestep.
         """
         self.plant = plant
 
@@ -64,11 +58,9 @@ class KalmanFilter:
         """
         Project the model into the future with a new control input u.
 
-        Parameter ``u``:
-            New control input from controller.
-
-        Parameter ``dt``:
-            Timestep for prediction.
+        Args:
+            u: New control input from controller.
+            dt: Timestep for prediction.
         """
         discA, discB = discretize_ab(self.plant.A, self.plant.B, dt)
         _, discQ = discretize_aq(self.plant.A, self.contQ, dt)
@@ -85,11 +77,9 @@ class KalmanFilter:
         """
         Correct the state estimate x-hat using the measurements in y.
 
-        Parameter ``u``:
-            Same control input used in the last predict step.
-
-        Parameter ``y``:
-            Measurement vector.
+        Args:
+            u: Same control input used in the last predict step.
+            y: Measurement vector.
         """
         C = self.plant.C
         D = self.plant.D

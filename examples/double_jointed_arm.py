@@ -5,9 +5,9 @@
 import sys
 
 import matplotlib as mpl
-from matplotlib import animation
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import animation
 
 import frccontrol as fct
 

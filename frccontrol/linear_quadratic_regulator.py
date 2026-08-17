@@ -16,20 +16,12 @@ class LinearQuadraticRegulator:
         """
         Constructs a LinearQuadraticRegulator.
 
-        Parameter ``A``:
-            Continuous system matrix.
-
-        Parameter ``B``:
-            Continuous input matrix.
-
-        Parameter ``Qelems``:
-            The maximum desired error tolerance for each state.
-
-        Parameter ``Relems``:
-            The maximum desired control effort for each input.
-
-        Parameter ``dt``:
-            Discretization timestep.
+        Args:
+            A: Continuous system matrix.
+            B: Continuous input matrix.
+            Qelems: The maximum desired error tolerance for each state.
+            Relems: The maximum desired control effort for each input.
+            dt: Discretization timestep.
         """
         self.states = A.shape[0]
         self.inputs = B.shape[1]
@@ -61,11 +53,9 @@ class LinearQuadraticRegulator:
         """
         Returns the next output of the controller.
 
-        Parameter ``x``:
-            The current state vector x.
-
-        Parameter ``r``:
-            The current reference vector r (default: previous reference).
+        Args:
+            x: The current state vector x.
+            r: The current reference vector r (default: previous reference).
         """
         if r is not None:
             self.r = r
@@ -85,17 +75,11 @@ class LinearQuadraticRegulator:
         See https://file.tavsys.net/control/controls-engineering-in-frc.pdf
         appendix C.4 for a derivation.
 
-        Parameter ``A``:
-            Continuous system matrix.
-
-        Parameter ``B``:
-            Continuous input matrix.
-
-        Parameter ``dt``:
-            Discretization timestep.
-
-        Parameter ``input_delay``:
-            Input time delay.
+        Args:
+            A: Continuous system matrix.
+            B: Continuous input matrix.
+            dt: Discretization timestep.
+            input_delay: Input time delay.
         """
         discA, discB = discretize_ab(A, B, dt)
         self.K = self.K @ sp.linalg.fractional_matrix_power(

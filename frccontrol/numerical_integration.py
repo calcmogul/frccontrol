@@ -9,17 +9,11 @@ def rk4(f, x, u, dt):
     """
     Performs 4th order Runge-Kutta integration of dx/dt = f(x, u) for dt.
 
-    Parameter ``f``:
-        Vector function to integrate.
-
-    Parameter ``x``:
-        Vector of states.
-
-    Parameter ``u``:
-        Vector of inputs (constant for dt).
-
-    Parameter ``dt``:
-        Time for which to integrate.
+    Args:
+        f: Vector function to integrate.
+        x: Vector of states.
+        u: Vector of inputs (constant for dt).
+        dt: Time for which to integrate.
     """
     half_dt = dt * 0.5
     k1 = f(x, u)
@@ -33,17 +27,11 @@ def rkdp(f, x, u, dt, max_error=1e-6):
     """
     Performs adaptive Dormand-Prince integration of dx/dt = f(x, u) for dt.
 
-    Parameter ``f``:
-        Vector function to integrate.
-
-    Parameter ``x``:
-        Vector of states.
-
-    Parameter ``u``:
-        Vector of inputs (constant for dt).
-
-    Parameter ``dt``:
-        Time for which to integrate.
+    Args:
+        f: Vector function to integrate.
+        x: Vector of states.
+        u: Vector of inputs (constant for dt).
+        dt: Time for which to integrate.
     """
     A = np.empty((6, 6))
 

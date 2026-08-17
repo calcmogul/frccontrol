@@ -7,17 +7,11 @@ def numerical_jacobian(rows, cols, f, x):
     """
     Returns numerical Jacobian with respect to x for f(x).
 
-    Parameter ``rows``:
-        Number of rows in result of f(x).
-
-    Parameter ``cols``:
-        Number of columns in result of f(x).
-
-    Parameter ``f``:
-        Vector-valued function from which to compute Jacobian.
-
-    Parameter ``x``:
-        Vector argument.
+    Args:
+        rows: Number of rows in result of f(x).
+        cols: Number of columns in result of f(x).
+        f: Vector-valued function from which to compute Jacobian.
+        x: Vector argument.
     """
     EPSILON = 1e-5
     result = np.zeros((rows, cols))
@@ -35,20 +29,12 @@ def numerical_jacobian_x(rows, cols, f, x, u):
     """
     Returns numerical Jacobian with respect to x for f(x, u).
 
-    Parameter ``rows``:
-        Number of rows in result of f(x, u).
-
-    Parameter ``cols``:
-        Number of columns in result of f(x, u).
-
-    Parameter ``f``:
-        Vector-valued function from which to compute Jacobian.
-
-    Parameter ``x``:
-        State vector.
-
-    Parameter ``u``:
-        Input vector.
+    Args:
+        rows: Number of rows in result of f(x, u).
+        cols: Number of columns in result of f(x, u).
+        f: Vector-valued function from which to compute Jacobian.
+        x: State vector.
+        u: Input vector.
     """
     return numerical_jacobian(rows, cols, lambda x: f(x, u), x)
 
@@ -57,19 +43,11 @@ def numerical_jacobian_u(rows, cols, f, x, u):
     """
     Returns numerical Jacobian with respect to u for f(x, u).
 
-    Parameter ``rows``:
-        Number of rows in result of f(x, u).
-
-    Parameter ``cols``:
-        Number of columns in result of f(x, u).
-
-    Parameter ``f``:
-        Vector-valued function from which to compute Jacobian.
-
-    Parameter ``x``:
-        State vector.
-
-    Parameter ``u``:
-        Input vector.
+    Args:
+        rows: Number of rows in result of f(x, u).
+        cols: Number of columns in result of f(x, u).
+        f: Vector-valued function from which to compute Jacobian.
+        x: State vector.
+        u: Input vector.
     """
     return numerical_jacobian(rows, cols, lambda u: f(x, u), u)

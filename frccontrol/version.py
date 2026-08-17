@@ -3,6 +3,7 @@ from datetime import date
 
 
 def get_version():
+    year = date.today().year  # noqa: DTZ011
     proc = subprocess.run(
         [
             "git",
@@ -10,7 +11,7 @@ def get_version():
             "--count",
             # Includes previous year's commits in case one was merged after the
             # year incremented. Otherwise, the version wouldn't increment.
-            '--after="main@{' + str(date.today().year - 1) + '-01-01}"',
+            '--after="main@{' + str(year - 1) + '-01-01}"',
             "main",
         ],
         check=True,
@@ -24,4 +25,4 @@ def get_version():
         commit_count = proc.stdout
 
     # Version number: <year>.<# commits on main>
-    return f"{date.today().year}.{commit_count.strip()}"
+    return f"{year}.{commit_count.strip()}"
