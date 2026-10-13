@@ -11,7 +11,7 @@ class Trajectory:
         Initialize a Trajectory.
 
         Args:
-            times: 1D array of trajectory timestamps.
+            times: 1D array of trajectory times.
             states: 2D array of corresponding states, where each state is a
                 column.
         """
@@ -26,7 +26,7 @@ class Trajectory:
 
     def clip_time(self, time):
         """
-        Limit Trajectory timestamp between start_time and end_time.
+        Limit Trajectory time between start_time and end_time.
 
         Args:
             time: The time to clip.
@@ -118,9 +118,9 @@ class Trajectory:
         """
         Append another trajectory to this trajectory.
 
-        Will adjust timestamps on the appended trajectory so it starts
-        immediately after the current trajectory ends. Skips the first element
-        of the other trajectory to avoid repeats.
+        Will adjust times on the appended trajectory so it starts immediately
+        after the current trajectory ends. Skips the first element of the other
+        trajectory to avoid repeats.
 
         Args:
             other: The other trajectory to append to this one.
@@ -128,7 +128,7 @@ class Trajectory:
         # Create new trajectory based off of this one
         combined = Trajectory(self.times, self.states)
 
-        # Adjust timestamps on other trajectory
+        # Adjust times on other trajectory
         other.times = other.times + combined.end_time - other.start_time
 
         # Combine the time and states

@@ -14,7 +14,7 @@ def generate_trapezoid_profile(max_v, time_to_max_v, dt, goal):
         goal: Final position when the profile is at rest.
 
     Returns:
-        t_rec: List of timestamps.
+        t_rec: List of times.
         x_rec: List of positions at each timestep.
         v_rec: List of velocities at each timestep.
         a_rec: List of accelerations at each timestep.
@@ -73,7 +73,7 @@ def generate_s_curve_profile(max_v, max_a, time_to_max_a, dt, goal):
         goal: Final position when the profile is at rest.
 
     Returns:
-        t_rec: List of timestamps.
+        t_rec: List of times.
         x_rec: List of positions at each timestep.
         v_rec: List of velocities at each timestep.
         a_rec: List of accelerations at each timestep.

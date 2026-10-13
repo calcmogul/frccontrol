@@ -3,7 +3,7 @@ from datetime import date
 
 
 def get_version():
-    year = date.today().year  # noqa: DTZ011
+    year = date.today().year
     proc = subprocess.run(
         [
             "git",
